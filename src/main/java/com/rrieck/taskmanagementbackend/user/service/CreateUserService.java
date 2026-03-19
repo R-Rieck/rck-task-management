@@ -19,9 +19,9 @@ public class CreateUserService {
 		String password,
 		String name
 	) {
-		boolean doesExists = userRepository.existsByEmail(email);
+		boolean doesExist = userRepository.existsByEmail(email);
 
-		if (doesExists) {
+		if (doesExist) {
 			throw new IllegalStateException("Email already in use");
 		}
 
