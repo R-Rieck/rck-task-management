@@ -25,7 +25,9 @@ public class CreateUserService {
 			throw new IllegalStateException("Email already in use");
 		}
 
-		Role role = isAdmin ? Role.Admin : Role.User;
+		Role role = isAdmin ?
+			Role.Admin :
+			Role.User;
 
 		User user = User
 			.builder()
