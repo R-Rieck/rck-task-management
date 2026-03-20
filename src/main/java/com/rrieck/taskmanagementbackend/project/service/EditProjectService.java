@@ -4,6 +4,7 @@ import com.rrieck.taskmanagementbackend.project.dto.ProjectResponse;
 import com.rrieck.taskmanagementbackend.project.model.Project;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
 import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,17 +19,15 @@ public class EditProjectService {
 	private final ProjectRepository projectRepository;
 	private final UserRepository userRepository;
 
-	public ProjectResponse edit(UUID projectId, String newName, Optional<String> newDescription, UUID newOwnerUserId) {
-		User ownerRef = userRepository.getReferenceById(newOwnerUserId);
+	public ProjectResponse edit(UUID projectId, String newName, Optional<String> newDescription, UserId ownerId) {
+		User ownerRef = userRepository.getReferenceById(ownerId);
 		Project existingProject = projectRepository.findById(projectId).orElseThrow();
 
 		existingProject.setName(newName);
 		existingProject.setOwner(ownerRef);
 		existingProject.setUpdatedAt(LocalDateTime.now());
 
-		if (newDescription.isPresent()) {
-			existingProject.setDescription(newDescription.get());
-		}
+		newDescription.ifPresent(existingProject::setDescription);
 
 		projectRepository.save(existingProject);
 

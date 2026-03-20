@@ -26,7 +26,12 @@ public class Project {
 	private String description;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "owner_user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_project_user"))
+	@JoinColumn(
+		name = "owner_user_id",
+		referencedColumnName = "id",
+		nullable = false,
+		foreignKey = @ForeignKey(name = "fk_project_user")
+	)
 	private User owner;
 
 	@Column(name = "created_at", nullable = false)

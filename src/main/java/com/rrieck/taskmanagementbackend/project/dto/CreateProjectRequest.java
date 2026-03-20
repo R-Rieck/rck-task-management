@@ -1,12 +1,13 @@
 package com.rrieck.taskmanagementbackend.project.dto;
 
+import com.rrieck.taskmanagementbackend.user.model.UserId;
+
 import java.util.Optional;
-import java.util.UUID;
 
 
 public record CreateProjectRequest(
 	String name,
 	Optional<String> description,
-	UUID owner
+	UserId owner
 ) {
 }

@@ -5,14 +5,13 @@ import com.rrieck.taskmanagementbackend.auth.dto.response.AuthResponse;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.IssueNewTokenPairService;
 import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class LoginUserService {
 			)
 		);
 
-		User user = userRepository.findById(UUID.fromString(result.getName())).orElseThrow();
+		User user = userRepository.findById(UserId.fromString(result.getName())).orElseThrow();
 		TokenPair tokens = issueNewTokenPairService.issue(user.getId());
 
 		return AuthResponse.builder()

@@ -1,12 +1,11 @@
 package com.rrieck.taskmanagementbackend.user.dto;
 
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import lombok.Builder;
-
-import java.util.UUID;
 
 @Builder
 public record UserResponse(
-	UUID id,
+	UserId id,
 	String name,
 	String email,
 	String role

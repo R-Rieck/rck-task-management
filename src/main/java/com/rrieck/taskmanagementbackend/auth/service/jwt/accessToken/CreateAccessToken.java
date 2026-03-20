@@ -5,11 +5,11 @@ import com.rrieck.taskmanagementbackend.auth.model.jwt.JwtClaimKeys;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenType;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtProperties;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtTokenProvider;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +18,11 @@ public class CreateAccessToken {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	public String create(
-		UUID userId,
+		UserId userId,
 		Role role
 	) {
 		return jwtTokenProvider.generateToken(
-			userId.toString(),
+			userId.id().toString(),
 			jwtProperties.getAccessToken().getSecret(),
 			jwtProperties.getAccessToken().getExpiration(),
 			Map.of(

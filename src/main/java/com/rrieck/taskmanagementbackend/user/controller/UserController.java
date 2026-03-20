@@ -1,10 +1,7 @@
 package com.rrieck.taskmanagementbackend.user.controller;
 
-import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
 import com.rrieck.taskmanagementbackend.user.service.GetUserResponseByEmail;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,10 +9,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final GetUserResponseByEmail getUserResponseByEmail;
-
-    @GetMapping("/me")
-    public UserResponse me(Authentication authentication) {
-        return getUserResponseByEmail.get(authentication.getName());
-    }
+	private final GetUserResponseByEmail getUserResponseByEmail;
 }

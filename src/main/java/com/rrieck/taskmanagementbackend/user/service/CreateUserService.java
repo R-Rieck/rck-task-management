@@ -2,10 +2,13 @@ package com.rrieck.taskmanagementbackend.user.service;
 
 import com.rrieck.taskmanagementbackend.auth.model.Role;
 import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +35,10 @@ public class CreateUserService {
 		User user = User
 			.builder()
 			.name(name)
+			.id(UserId.generateId())
 			.email(email)
 			.password(passwordEncoder.encode(password))
+			.registeredAt(LocalDateTime.now())
 			.role(role)
 			.build();
 

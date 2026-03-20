@@ -6,11 +6,10 @@ import com.rrieck.taskmanagementbackend.auth.service.jwt.accessToken.CreateAcces
 import com.rrieck.taskmanagementbackend.auth.service.jwt.refreshToken.CreateRefreshToken;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.refreshToken.RevokeRefreshToken;
 import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class IssueRefreshTokenPairService {
 	private final UserRepository userRepository;
 
 	public TokenPair issue(
-		UUID userId,
+		UserId userId,
 		RefreshToken refreshToken
 	) {
 		User user = userRepository.findById(userId).orElseThrow();
