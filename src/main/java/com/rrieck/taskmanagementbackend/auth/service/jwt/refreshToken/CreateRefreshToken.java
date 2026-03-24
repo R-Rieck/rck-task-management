@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Service
@@ -32,11 +33,13 @@ public class CreateRefreshToken {
 		User user = userRepository.findById(userId).orElseThrow();
 
 		String token = jwtTokenProvider.generateToken(
-			user.getId().toString(),
+			user.getId().id().toString(),
 			jwtProperties.getRefreshToken().getSecret(),
 			jwtProperties.getRefreshToken().getExpiration(),
-			Map.of(JwtClaimKeys.TYPE, TokenType.REFRESH.name())
-
+			Map.of(
+				JwtClaimKeys.TYPE, TokenType.REFRESH.name(),
+				"jti", UUID.randomUUID().toString()
+			)
 		);
 
 		RefreshToken refreshToken =

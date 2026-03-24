@@ -29,7 +29,7 @@ public class RefreshAuthenticationService {
 			throw new IllegalArgumentException("Refresh token is expired");
 		}
 
-		if (checkRefreshTokenForValidity.isValid(refreshToken, user.getId().toString())) {
+		if (!checkRefreshTokenForValidity.isValid(refreshToken, user.getId().id().toString())) {
 			throw new IllegalArgumentException("Invalid refresh token");
 		}
 

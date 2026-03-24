@@ -1,6 +1,7 @@
 package com.rrieck.taskmanagementbackend.project.service;
 
 import com.rrieck.taskmanagementbackend.project.dto.ProjectMemberResponse;
+import com.rrieck.taskmanagementbackend.project.dto.ProjectResponse;
 import com.rrieck.taskmanagementbackend.project.dto.ProjectWithMemberResponse;
 import com.rrieck.taskmanagementbackend.project.model.Project;
 import com.rrieck.taskmanagementbackend.project.model.ProjectId;
@@ -49,6 +50,6 @@ public class AddMemberToProjectService {
 				.build())
 			.toList();
 
-		return ProjectWithMemberResponse.builder().project(projectRef).member(projectMemberResponse).build();
+		return ProjectWithMemberResponse.from(ProjectResponse.from(projectRef), projectMemberResponse);
 	}
 }
