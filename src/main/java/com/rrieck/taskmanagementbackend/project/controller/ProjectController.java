@@ -1,16 +1,11 @@
 package com.rrieck.taskmanagementbackend.project.controller;
 
-import com.rrieck.taskmanagementbackend.project.dto.CreateProjectRequest;
-import com.rrieck.taskmanagementbackend.project.dto.EditProjectRequest;
-import com.rrieck.taskmanagementbackend.project.dto.ProjectResponse;
-import com.rrieck.taskmanagementbackend.project.service.CreateProjectService;
-import com.rrieck.taskmanagementbackend.project.service.DeleteProjectService;
-import com.rrieck.taskmanagementbackend.project.service.EditProjectService;
+import com.rrieck.taskmanagementbackend.project.dto.*;
+import com.rrieck.taskmanagementbackend.project.model.ProjectId;
+import com.rrieck.taskmanagementbackend.project.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -19,6 +14,8 @@ public class ProjectController {
 	private final CreateProjectService createProjectService;
 	private final EditProjectService editProjectService;
 	private final DeleteProjectService deleteProjectService;
+	private final GetProjectMemberService getProjectMemberService;
+	private final AddMemberToProjectService addMemberToProjectService;
 
 	@PostMapping
 	public ProjectResponse create(
@@ -32,9 +29,30 @@ public class ProjectController {
 		);
 	}
 
+	@PostMapping("/memebers/{projectId}")
+	public ProjectWithMemberResponse getMembers(
+		@PathVariable String projectId,
+		Authentication authentication
+	) {
+		return getProjectMemberService.get(
+			ProjectId.fromString(projectId)
+		);
+	}
+
+	@PostMapping("/memebers/add")
+	public ProjectWithMemberResponse getMembers(
+		@RequestBody AddMemberToProjectRequest request,
+		Authentication authentication
+	) {
+		return addMemberToProjectService.add(
+			request.members(),
+			request.projectId()
+		);
+	}
+
 	@PatchMapping("/{projectId}")
 	public ProjectResponse edit(
-		@PathVariable UUID projectId,
+		@PathVariable ProjectId projectId,
 		@RequestBody EditProjectRequest request,
 		Authentication authentication
 	) {
@@ -49,7 +67,7 @@ public class ProjectController {
 
 	@DeleteMapping("/{projectId}")
 	public void delete(
-		@PathVariable UUID projectId,
+		@PathVariable ProjectId projectId,
 		Authentication authentication
 	) {
 		deleteProjectService.delete(projectId);

@@ -17,12 +17,6 @@ public class GetUserResponseByEmail {
 			.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-		return UserResponse
-			.builder()
-			.id(user.getId())
-			.name(user.getName())
-			.email(user.getEmail())
-			.role(user.getRole().name())
-			.build();
+		return UserResponse.from(user);
 	}
 }

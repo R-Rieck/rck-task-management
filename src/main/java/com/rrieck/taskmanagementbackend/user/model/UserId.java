@@ -6,7 +6,7 @@ import jakarta.persistence.Embeddable;
 import java.util.UUID;
 
 @Embeddable
-public final class UserId extends Identifier<UserId> {
+public final class UserId extends Identifier {
 	public UserId(UUID id) {
 		super(id);
 	}

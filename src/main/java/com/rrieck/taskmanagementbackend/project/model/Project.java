@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "projects")
@@ -15,9 +14,8 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Project {
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
+	@EmbeddedId
+	private ProjectId id;
 
 	@Column(nullable = false)
 	private String name;

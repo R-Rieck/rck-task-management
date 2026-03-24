@@ -2,6 +2,7 @@ package com.rrieck.taskmanagementbackend.project.service;
 
 import com.rrieck.taskmanagementbackend.project.dto.ProjectResponse;
 import com.rrieck.taskmanagementbackend.project.model.Project;
+import com.rrieck.taskmanagementbackend.project.model.ProjectId;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
@@ -22,6 +23,7 @@ public class CreateProjectService {
 		User ownerRef = userRepository.getReferenceById(ownerUserId);
 		Project project = Project
 			.builder()
+			.id(ProjectId.generateId())
 			.name(name)
 			.owner(ownerRef)
 			.createdAt(LocalDateTime.now())
@@ -32,12 +34,6 @@ public class CreateProjectService {
 
 		projectRepository.save(project);
 
-		return ProjectResponse
-			.builder()
-			.id(project.getId())
-			.name(project.getName())
-			.description(description)
-			.owner(project.getOwner())
-			.build();
+		return ProjectResponse.from(project);
 	}
 }

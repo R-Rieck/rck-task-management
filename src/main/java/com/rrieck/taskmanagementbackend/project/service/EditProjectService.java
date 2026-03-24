@@ -2,6 +2,7 @@ package com.rrieck.taskmanagementbackend.project.service;
 
 import com.rrieck.taskmanagementbackend.project.dto.ProjectResponse;
 import com.rrieck.taskmanagementbackend.project.model.Project;
+import com.rrieck.taskmanagementbackend.project.model.ProjectId;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class EditProjectService {
 	private final ProjectRepository projectRepository;
 	private final UserRepository userRepository;
 
-	public ProjectResponse edit(UUID projectId, String newName, Optional<String> newDescription, UserId ownerId) {
+	public ProjectResponse edit(ProjectId projectId, String newName, Optional<String> newDescription, UserId ownerId) {
 		User ownerRef = userRepository.getReferenceById(ownerId);
 		Project existingProject = projectRepository.findById(projectId).orElseThrow();
 
@@ -31,12 +31,6 @@ public class EditProjectService {
 
 		projectRepository.save(existingProject);
 
-		return ProjectResponse
-			.builder()
-			.id(existingProject.getId())
-			.name(existingProject.getName())
-			.description(newDescription)
-			.owner(existingProject.getOwner())
-			.build();
+		return ProjectResponse.from(existingProject);
 	}
 }
