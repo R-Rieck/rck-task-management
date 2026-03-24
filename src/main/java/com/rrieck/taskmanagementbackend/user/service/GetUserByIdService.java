@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GetUserResponseByEmail {
+public class GetUserByIdService {
 	private final UserRepository userRepository;
 
 	public UserResponse get(UserId userId) {
