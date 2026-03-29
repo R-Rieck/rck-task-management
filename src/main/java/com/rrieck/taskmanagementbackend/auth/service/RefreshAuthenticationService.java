@@ -29,16 +29,18 @@ public class RefreshAuthenticationService {
 			throw new IllegalArgumentException("Refresh token is expired");
 		}
 
-		if (checkRefreshTokenForValidity.isValid(refreshToken, user.getId().toString())) {
+		if (!checkRefreshTokenForValidity.isValid(refreshToken, user.getId().id().toString())) {
 			throw new IllegalArgumentException("Invalid refresh token");
 		}
 
 		TokenPair newTokens = issueRefreshTokenPairService.issue(user.getId(), existingRefreshToken);
 
-		return AuthResponse.builder()
-		                   .accessToken(newTokens.getAccessToken())
-		                   .refreshToken(newTokens.getRefreshToken())
-		                   .userId(user.getId())
-		                   .build();
+		return AuthResponse
+			.builder()
+			.accessToken(newTokens.getAccessToken())
+			.refreshToken(newTokens.getRefreshToken())
+			.accountId(user.getLastUsedAccountId())
+			.userId(user.getId())
+			.build();
 	}
 }

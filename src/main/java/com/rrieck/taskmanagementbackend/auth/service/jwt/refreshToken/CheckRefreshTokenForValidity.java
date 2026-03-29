@@ -21,7 +21,7 @@ public class CheckRefreshTokenForValidity {
 
 		String type = claims.get(JwtClaimKeys.TYPE, String.class);
 
-		return TokenType.REFRESH.equals(type)
+		return TokenType.REFRESH.name().equals(type)
 			&& claims.getSubject().equals(expectedSubject)
 			&& claims.getExpiration().after(new Date());
 	}

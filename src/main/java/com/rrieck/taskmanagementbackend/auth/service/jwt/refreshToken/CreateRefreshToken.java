@@ -7,6 +7,7 @@ import com.rrieck.taskmanagementbackend.auth.repository.RefreshTokenRepository;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtProperties;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtTokenProvider;
 import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,15 +29,17 @@ public class CreateRefreshToken {
 	@Value("${security.jwt.refresh-token.expiration}")
 	private long expirationMs;
 
-	public RefreshToken create(UUID userId) {
+	public RefreshToken create(UserId userId) {
 		User user = userRepository.findById(userId).orElseThrow();
 
 		String token = jwtTokenProvider.generateToken(
-			user.getId().toString(),
+			user.getId().id().toString(),
 			jwtProperties.getRefreshToken().getSecret(),
 			jwtProperties.getRefreshToken().getExpiration(),
-			Map.of(JwtClaimKeys.TYPE, TokenType.REFRESH.name())
-
+			Map.of(
+				JwtClaimKeys.TYPE, TokenType.REFRESH.name(),
+				"jti", UUID.randomUUID().toString()
+			)
 		);
 
 		RefreshToken refreshToken =

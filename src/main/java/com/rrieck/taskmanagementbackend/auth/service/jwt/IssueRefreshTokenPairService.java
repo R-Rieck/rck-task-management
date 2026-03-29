@@ -1,16 +1,17 @@
 package com.rrieck.taskmanagementbackend.auth.service.jwt;
 
+import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMember;
+import com.rrieck.taskmanagementbackend.accountMemeber.repository.AccountMemberRepository;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.RefreshToken;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.accessToken.CreateAccessToken;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.refreshToken.CreateRefreshToken;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.refreshToken.RevokeRefreshToken;
 import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,16 +20,18 @@ public class IssueRefreshTokenPairService {
 	private final CreateRefreshToken createRefreshToken;
 	private final RevokeRefreshToken revokeRefreshToken;
 	private final UserRepository userRepository;
+	private final AccountMemberRepository accountMemberRepository;
 
 	public TokenPair issue(
-		UUID userId,
+		UserId userId,
 		RefreshToken refreshToken
 	) {
 		User user = userRepository.findById(userId).orElseThrow();
+		AccountMember member = accountMemberRepository.getByAccountIdAndUserId(user.getLastUsedAccountId(), user.getId());
 
 		revokeRefreshToken.revoke(refreshToken);
 
-		String newAccessToken = createAccessToken.create(user.getId(), user.getRole());
+		String newAccessToken = createAccessToken.create(user.getId(), member.getRole());
 		RefreshToken newRefreshToken = createRefreshToken.create(user.getId());
 
 		return TokenPair.builder()

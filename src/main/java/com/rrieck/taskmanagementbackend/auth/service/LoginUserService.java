@@ -9,10 +9,7 @@ import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,18 +19,19 @@ public class LoginUserService {
 	private final IssueNewTokenPairService issueNewTokenPairService;
 
 	public AuthResponse login(LoginUserRequest request) {
-		Authentication result = authenticationManager.authenticate(
+		authenticationManager.authenticate(
 			new UsernamePasswordAuthenticationToken(
 				request.email(),
 				request.password()
 			)
 		);
 
-		User user = userRepository.findById(UUID.fromString(result.getName())).orElseThrow();
-		TokenPair tokens = issueNewTokenPairService.issue(user.getId());
+		User user = userRepository.findOptByEmail(request.email()).orElseThrow();
+		TokenPair tokens = issueNewTokenPairService.issue(user.getId(), user.getLastUsedAccountId());
 
 		return AuthResponse.builder()
 		                   .userId(user.getId())
+		                   .accountId(user.getLastUsedAccountId())
 		                   .accessToken(tokens.getAccessToken())
 		                   .refreshToken(tokens.getRefreshToken())
 		                   .build();
