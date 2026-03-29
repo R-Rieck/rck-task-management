@@ -1,0 +1,32 @@
+extend type Mutation {
+    login(input: LoginUserInput!): AuthResponse!
+    register(input: RegisterUserInput!): AuthResponse!
+    refresh(input: RefreshAuthenticationInput!): AuthResponse!
+    logout(input: LogoutInput!): Boolean!
+}
+
+type AuthResponse {
+    accessToken: String!
+    refreshToken: String!
+    userId: ID!
+    accountId: ID!
+}
+
+input LoginUserInput {
+    email: String!
+    password: String!
+}
+
+input LogoutInput {
+    refreshToken: String!
+}
+
+input RefreshAuthenticationInput {
+    refreshToken: String!
+}
+
+input RegisterUserInput {
+    name: String!
+    email: String!
+    password: String!
+}

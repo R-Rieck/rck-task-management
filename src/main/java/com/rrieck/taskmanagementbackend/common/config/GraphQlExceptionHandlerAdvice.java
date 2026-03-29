@@ -1,0 +1,41 @@
+package com.rrieck.taskmanagementbackend.common.config;
+
+import com.rrieck.taskmanagementbackend.common.error.OutgoingException;
+import graphql.GraphQLError;
+import graphql.GraphqlErrorBuilder;
+import graphql.schema.DataFetchingEnvironment;
+import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
+import org.springframework.graphql.execution.ErrorType;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+
+import java.util.Map;
+
+@ControllerAdvice
+public class GraphQlExceptionHandlerAdvice {
+
+	@GraphQlExceptionHandler(OutgoingException.class)
+	public GraphQLError handleOutgoingException(
+		OutgoingException exception,
+		DataFetchingEnvironment environment
+	) {
+		return GraphqlErrorBuilder.newError(environment)
+		                          .errorType(ErrorType.BAD_REQUEST)
+		                          .message(exception.getMessage())
+		                          .extensions(Map.of(
+			                          "code", exception.getErrorCode(),
+			                          "httpStatus", exception.getStatus().value()
+		                          ))
+		                          .build();
+	}
+
+	@GraphQlExceptionHandler(Exception.class)
+	public GraphQLError handleException(
+		Exception exception,
+		DataFetchingEnvironment environment
+	) {
+		return GraphqlErrorBuilder.newError(environment)
+		                          .errorType(ErrorType.INTERNAL_ERROR)
+		                          .message("An unexpected error occurred")
+		                          .build();
+	}
+}

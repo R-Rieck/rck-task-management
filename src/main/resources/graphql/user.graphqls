@@ -1,0 +1,19 @@
+extend type Query {
+    me: UserType!
+}
+
+extend type Mutation {
+    editUser(input: EditUserInput!): UserType!
+}
+
+type UserType {
+    id: ID!
+    name: String!
+    email: String!
+}
+
+input EditUserInput {
+    name: String
+    email: String
+    password: String
+}

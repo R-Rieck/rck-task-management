@@ -3,9 +3,9 @@ package com.rrieck.taskmanagementbackend.auth.service;
 import com.rrieck.taskmanagementbackend.account.model.AccountId;
 import com.rrieck.taskmanagementbackend.account.service.CreateAccountService;
 import com.rrieck.taskmanagementbackend.accountMemeber.service.CreateAccountMember;
-import com.rrieck.taskmanagementbackend.auth.dto.response.AuthResponse;
 import com.rrieck.taskmanagementbackend.auth.model.Role;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
+import com.rrieck.taskmanagementbackend.auth.schema.AuthTypes;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.IssueNewTokenPairService;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.service.CreateUserService;
@@ -20,7 +20,7 @@ public class RegisterUserService {
 	private final CreateAccountMember createAccountMember;
 	private final IssueNewTokenPairService issueNewTokenPairService;
 
-	public AuthResponse register(
+	public AuthTypes.AuthResponseType register(
 		String name,
 		String email,
 		String password
@@ -37,7 +37,7 @@ public class RegisterUserService {
 
 		TokenPair tokens = issueNewTokenPairService.issue(userId, accountId);
 
-		return AuthResponse
+		return AuthTypes.AuthResponseType
 			.builder()
 			.userId(userId)
 			.accountId(accountId)

@@ -1,8 +1,7 @@
 package com.rrieck.taskmanagementbackend.auth.service;
 
-import com.rrieck.taskmanagementbackend.auth.dto.request.LoginUserRequest;
-import com.rrieck.taskmanagementbackend.auth.dto.response.AuthResponse;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
+import com.rrieck.taskmanagementbackend.auth.schema.AuthTypes;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.IssueNewTokenPairService;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
@@ -18,22 +17,23 @@ public class LoginUserService {
 	private final AuthenticationManager authenticationManager;
 	private final IssueNewTokenPairService issueNewTokenPairService;
 
-	public AuthResponse login(LoginUserRequest request) {
+	public AuthTypes.AuthResponseType login(String email, String password) {
+		User user = userRepository.findOptByEmail(email).orElseThrow();
 		authenticationManager.authenticate(
 			new UsernamePasswordAuthenticationToken(
-				request.email(),
-				request.password()
+				user.getId(),
+				password
 			)
 		);
 
-		User user = userRepository.findOptByEmail(request.email()).orElseThrow();
 		TokenPair tokens = issueNewTokenPairService.issue(user.getId(), user.getLastUsedAccountId());
 
-		return AuthResponse.builder()
-		                   .userId(user.getId())
-		                   .accountId(user.getLastUsedAccountId())
-		                   .accessToken(tokens.getAccessToken())
-		                   .refreshToken(tokens.getRefreshToken())
-		                   .build();
+		return AuthTypes.AuthResponseType
+			.builder()
+			.userId(user.getId())
+			.accountId(user.getLastUsedAccountId())
+			.accessToken(tokens.getAccessToken())
+			.refreshToken(tokens.getRefreshToken())
+			.build();
 	}
 }

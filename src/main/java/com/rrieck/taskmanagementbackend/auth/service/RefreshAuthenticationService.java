@@ -1,9 +1,9 @@
 package com.rrieck.taskmanagementbackend.auth.service;
 
-import com.rrieck.taskmanagementbackend.auth.dto.response.AuthResponse;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.RefreshToken;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.repository.RefreshTokenRepository;
+import com.rrieck.taskmanagementbackend.auth.schema.AuthTypes;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.IssueRefreshTokenPairService;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.refreshToken.CheckRefreshTokenForValidity;
 import com.rrieck.taskmanagementbackend.user.model.User;
@@ -17,7 +17,7 @@ public class RefreshAuthenticationService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final CheckRefreshTokenForValidity checkRefreshTokenForValidity;
 
-	public AuthResponse refresh(String refreshToken) {
+	public AuthTypes.AuthResponseType refresh(String refreshToken) {
 		RefreshToken existingRefreshToken = refreshTokenRepository.findByToken(refreshToken).orElseThrow();
 		User user = existingRefreshToken.getUser();
 
@@ -35,7 +35,7 @@ public class RefreshAuthenticationService {
 
 		TokenPair newTokens = issueRefreshTokenPairService.issue(user.getId(), existingRefreshToken);
 
-		return AuthResponse
+		return AuthTypes.AuthResponseType
 			.builder()
 			.accessToken(newTokens.getAccessToken())
 			.refreshToken(newTokens.getRefreshToken())
