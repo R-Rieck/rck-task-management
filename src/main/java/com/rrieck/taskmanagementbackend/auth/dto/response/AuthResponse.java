@@ -1,5 +1,6 @@
 package com.rrieck.taskmanagementbackend.auth.dto.response;
 
+import com.rrieck.taskmanagementbackend.account.model.AccountId;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import lombok.Builder;
 
@@ -7,6 +8,7 @@ import lombok.Builder;
 public record AuthResponse(
 	String accessToken,
 	String refreshToken,
-	UserId userId
+	UserId userId,
+	AccountId accountId
 ) {
 }

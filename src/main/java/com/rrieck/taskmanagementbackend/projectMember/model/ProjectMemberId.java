@@ -1,4 +1,4 @@
-package com.rrieck.taskmanagementbackend.project.model;
+package com.rrieck.taskmanagementbackend.projectMember.model;
 
 import com.rrieck.taskmanagementbackend.common.identifier.Identifier;
 import jakarta.persistence.Embeddable;

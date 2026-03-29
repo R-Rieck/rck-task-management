@@ -1,6 +1,7 @@
 package com.rrieck.taskmanagementbackend.user.service;
 
-import com.rrieck.taskmanagementbackend.auth.model.Role;
+import com.rrieck.taskmanagementbackend.account.model.AccountId;
+import com.rrieck.taskmanagementbackend.user.exception.EmailAlreadyRegistered;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
@@ -16,8 +17,8 @@ public class CreateUserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public User create(
-		Boolean isAdmin,
+	public UserId create(
+		AccountId accountId,
 		String email,
 		String password,
 		String name
@@ -25,23 +26,23 @@ public class CreateUserService {
 		boolean doesExist = userRepository.existsByEmail(email);
 
 		if (doesExist) {
-			throw new IllegalStateException("Email already in use");
+			throw new EmailAlreadyRegistered();
 		}
 
-		Role role = isAdmin ?
-			Role.Admin :
-			Role.User;
+		UserId userId = UserId.generateId();
 
 		User user = User
 			.builder()
 			.name(name)
-			.id(UserId.generateId())
+			.id(userId)
 			.email(email)
 			.password(passwordEncoder.encode(password))
 			.registeredAt(LocalDateTime.now())
-			.role(role)
+			.lastUsedAccountId(accountId)
 			.build();
 
-		return userRepository.save(user);
+		userRepository.save(user);
+
+		return userId;
 	}
 }

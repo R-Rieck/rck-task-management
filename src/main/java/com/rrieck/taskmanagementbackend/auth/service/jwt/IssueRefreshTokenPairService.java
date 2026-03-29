@@ -1,5 +1,7 @@
 package com.rrieck.taskmanagementbackend.auth.service.jwt;
 
+import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMember;
+import com.rrieck.taskmanagementbackend.accountMemeber.repository.AccountMemberRepository;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.RefreshToken;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.accessToken.CreateAccessToken;
@@ -18,16 +20,18 @@ public class IssueRefreshTokenPairService {
 	private final CreateRefreshToken createRefreshToken;
 	private final RevokeRefreshToken revokeRefreshToken;
 	private final UserRepository userRepository;
+	private final AccountMemberRepository accountMemberRepository;
 
 	public TokenPair issue(
 		UserId userId,
 		RefreshToken refreshToken
 	) {
 		User user = userRepository.findById(userId).orElseThrow();
+		AccountMember member = accountMemberRepository.getByAccountIdAndUserId(user.getLastUsedAccountId(), user.getId());
 
 		revokeRefreshToken.revoke(refreshToken);
 
-		String newAccessToken = createAccessToken.create(user.getId(), user.getRole());
+		String newAccessToken = createAccessToken.create(user.getId(), member.getRole());
 		RefreshToken newRefreshToken = createRefreshToken.create(user.getId());
 
 		return TokenPair.builder()

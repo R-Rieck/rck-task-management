@@ -1,7 +1,7 @@
 package com.rrieck.taskmanagementbackend.user.service;
 
-import com.rrieck.taskmanagementbackend.user.EmailAlreadyRegistered;
 import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
+import com.rrieck.taskmanagementbackend.user.exception.EmailAlreadyRegistered;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
@@ -24,9 +24,13 @@ public class EditUserService {
 		Optional<String> passwordOpt
 	) {
 		User user = userRepository.getReferenceById(userId);
-		Boolean doesEmailExists = emailOpt.isPresent() ? userRepository.existsByEmail(emailOpt.get()) : false;
 
-		if (doesEmailExists) throw new EmailAlreadyRegistered(emailOpt.get());
+		boolean isEmailUsedByAnotherUser = emailOpt
+			.flatMap(userRepository::findOptByEmail)
+			.map(existingUser -> !existingUser.getId().equals(userId))
+			.orElse(false);
+
+		if (isEmailUsedByAnotherUser) throw new EmailAlreadyRegistered();
 
 		emailOpt.ifPresent(user::setEmail);
 		nameOpt.ifPresent(user::setName);

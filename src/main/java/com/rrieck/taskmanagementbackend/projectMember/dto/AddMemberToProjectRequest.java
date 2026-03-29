@@ -1,4 +1,4 @@
-package com.rrieck.taskmanagementbackend.project.dto;
+package com.rrieck.taskmanagementbackend.projectMember.dto;
 
 import com.rrieck.taskmanagementbackend.project.model.ProjectId;
 import com.rrieck.taskmanagementbackend.user.model.UserId;

@@ -1,9 +1,13 @@
 package com.rrieck.taskmanagementbackend.auth.service;
 
+import com.rrieck.taskmanagementbackend.account.model.AccountId;
+import com.rrieck.taskmanagementbackend.account.service.CreateAccountService;
+import com.rrieck.taskmanagementbackend.accountMemeber.service.CreateAccountMember;
 import com.rrieck.taskmanagementbackend.auth.dto.response.AuthResponse;
+import com.rrieck.taskmanagementbackend.auth.model.Role;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.IssueNewTokenPairService;
-import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.service.CreateUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class RegisterUserService {
-	private final CreateUserService createUser;
+	private final CreateUserService createUserService;
+	private final CreateAccountService createAccountService;
+	private final CreateAccountMember createAccountMember;
 	private final IssueNewTokenPairService issueNewTokenPairService;
 
 	public AuthResponse register(
@@ -19,21 +25,24 @@ public class RegisterUserService {
 		String email,
 		String password
 	) {
-		User user = createUser.create(
-			false,
+		AccountId accountId = createAccountService.create(name);
+		UserId userId = createUserService.create(
+			accountId,
 			email,
 			password,
 			name
 		);
 
-		TokenPair tokens = issueNewTokenPairService.issue(
-			user.getId()
-		);
+		createAccountMember.create(accountId, userId, Role.Admin);
 
-		return AuthResponse.builder()
-		                   .userId(user.getId())
-		                   .accessToken(tokens.getAccessToken())
-		                   .refreshToken(tokens.getRefreshToken())
-		                   .build();
+		TokenPair tokens = issueNewTokenPairService.issue(userId, accountId);
+
+		return AuthResponse
+			.builder()
+			.userId(userId)
+			.accountId(accountId)
+			.accessToken(tokens.getAccessToken())
+			.refreshToken(tokens.getRefreshToken())
+			.build();
 	}
 }

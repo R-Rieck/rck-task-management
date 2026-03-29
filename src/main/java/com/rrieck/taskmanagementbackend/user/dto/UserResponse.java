@@ -8,8 +8,7 @@ import lombok.Builder;
 public record UserResponse(
 	UserId id,
 	String name,
-	String email,
-	String role
+	String email
 ) {
 	public static UserResponse from(User user) {
 		return UserResponse
@@ -17,7 +16,6 @@ public record UserResponse(
 			.id(user.getId())
 			.name(user.getName())
 			.email(user.getEmail())
-			.role(user.getRole().toString())
 			.build();
 	}
 }

@@ -1,6 +1,6 @@
-package com.rrieck.taskmanagementbackend.project.dto;
+package com.rrieck.taskmanagementbackend.projectMember.dto;
 
-import com.rrieck.taskmanagementbackend.project.model.ProjectMember;
+import com.rrieck.taskmanagementbackend.projectMember.model.ProjectMember;
 import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
 import lombok.Builder;
 

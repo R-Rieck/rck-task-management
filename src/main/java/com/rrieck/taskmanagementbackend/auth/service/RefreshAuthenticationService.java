@@ -35,10 +35,12 @@ public class RefreshAuthenticationService {
 
 		TokenPair newTokens = issueRefreshTokenPairService.issue(user.getId(), existingRefreshToken);
 
-		return AuthResponse.builder()
-		                   .accessToken(newTokens.getAccessToken())
-		                   .refreshToken(newTokens.getRefreshToken())
-		                   .userId(user.getId())
-		                   .build();
+		return AuthResponse
+			.builder()
+			.accessToken(newTokens.getAccessToken())
+			.refreshToken(newTokens.getRefreshToken())
+			.accountId(user.getLastUsedAccountId())
+			.userId(user.getId())
+			.build();
 	}
 }

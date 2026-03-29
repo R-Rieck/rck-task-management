@@ -1,14 +1,14 @@
-package com.rrieck.taskmanagementbackend.project.service;
+package com.rrieck.taskmanagementbackend.projectMember.service;
 
-import com.rrieck.taskmanagementbackend.project.dto.ProjectMemberResponse;
 import com.rrieck.taskmanagementbackend.project.dto.ProjectResponse;
-import com.rrieck.taskmanagementbackend.project.dto.ProjectWithMemberResponse;
 import com.rrieck.taskmanagementbackend.project.model.Project;
 import com.rrieck.taskmanagementbackend.project.model.ProjectId;
-import com.rrieck.taskmanagementbackend.project.model.ProjectMember;
-import com.rrieck.taskmanagementbackend.project.model.ProjectMemberId;
-import com.rrieck.taskmanagementbackend.project.repository.ProjectMemberRepository;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
+import com.rrieck.taskmanagementbackend.projectMember.dto.ProjectMemberResponse;
+import com.rrieck.taskmanagementbackend.projectMember.dto.ProjectWithMemberResponse;
+import com.rrieck.taskmanagementbackend.projectMember.model.ProjectMember;
+import com.rrieck.taskmanagementbackend.projectMember.model.ProjectMemberId;
+import com.rrieck.taskmanagementbackend.projectMember.repository.ProjectMemberRepository;
 import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;

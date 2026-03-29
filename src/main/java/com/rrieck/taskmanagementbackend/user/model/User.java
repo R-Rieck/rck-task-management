@@ -1,6 +1,6 @@
 package com.rrieck.taskmanagementbackend.user.model;
 
-import com.rrieck.taskmanagementbackend.auth.model.Role;
+import com.rrieck.taskmanagementbackend.account.model.AccountId;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,10 +26,10 @@ public class User {
 	@Column(nullable = false)
 	private String email;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private Role role;
-
 	@Column(nullable = false)
 	private LocalDateTime registeredAt;
+
+	@Embedded
+	@AttributeOverride(name = "id", column = @Column(name = "last_used_account_id", nullable = false))
+	private AccountId lastUsedAccountId;
 }

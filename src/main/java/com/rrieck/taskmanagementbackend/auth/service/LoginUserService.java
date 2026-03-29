@@ -27,10 +27,11 @@ public class LoginUserService {
 		);
 
 		User user = userRepository.findOptByEmail(request.email()).orElseThrow();
-		TokenPair tokens = issueNewTokenPairService.issue(user.getId());
+		TokenPair tokens = issueNewTokenPairService.issue(user.getId(), user.getLastUsedAccountId());
 
 		return AuthResponse.builder()
 		                   .userId(user.getId())
+		                   .accountId(user.getLastUsedAccountId())
 		                   .accessToken(tokens.getAccessToken())
 		                   .refreshToken(tokens.getRefreshToken())
 		                   .build();

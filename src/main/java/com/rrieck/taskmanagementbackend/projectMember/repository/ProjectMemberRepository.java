@@ -1,8 +1,8 @@
-package com.rrieck.taskmanagementbackend.project.repository;
+package com.rrieck.taskmanagementbackend.projectMember.repository;
 
 import com.rrieck.taskmanagementbackend.project.model.ProjectId;
-import com.rrieck.taskmanagementbackend.project.model.ProjectMember;
-import com.rrieck.taskmanagementbackend.project.model.ProjectMemberId;
+import com.rrieck.taskmanagementbackend.projectMember.model.ProjectMember;
+import com.rrieck.taskmanagementbackend.projectMember.model.ProjectMemberId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
