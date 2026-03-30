@@ -9,10 +9,10 @@ import com.rrieck.taskmanagementbackend.projectMember.dto.ProjectWithMemberRespo
 import com.rrieck.taskmanagementbackend.projectMember.model.ProjectMember;
 import com.rrieck.taskmanagementbackend.projectMember.model.ProjectMemberId;
 import com.rrieck.taskmanagementbackend.projectMember.repository.ProjectMemberRepository;
-import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
+import com.rrieck.taskmanagementbackend.user.schema.UserTypes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +45,7 @@ public class AddMemberToProjectService {
 			.stream()
 			.map(projectMember -> ProjectMemberResponse
 				.builder()
-				.user(UserResponse.from(projectMember.getUser()))
+				.user(UserTypes.UserResponse.from(projectMember.getUser()))
 				.joinedAt(projectMember.getJoinedAt())
 				.build())
 			.toList();

@@ -8,8 +8,8 @@ extend type Mutation {
 type AuthResponse {
     accessToken: String!
     refreshToken: String!
-    userId: ID!
-    accountId: ID!
+    userId: UserId!
+    accountId: AccountId!
 }
 
 input LoginUserInput {

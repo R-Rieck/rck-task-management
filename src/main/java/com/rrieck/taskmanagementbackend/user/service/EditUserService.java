@@ -1,10 +1,10 @@
 package com.rrieck.taskmanagementbackend.user.service;
 
-import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
 import com.rrieck.taskmanagementbackend.user.exception.EmailAlreadyRegistered;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
+import com.rrieck.taskmanagementbackend.user.schema.UserTypes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class EditUserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public UserResponse edit(
+	public UserTypes.UserResponse edit(
 		UserId userId,
 		Optional<String> nameOpt,
 		Optional<String> emailOpt,
@@ -38,6 +38,6 @@ public class EditUserService {
 
 		userRepository.save(user);
 
-		return UserResponse.from(user);
+		return UserTypes.UserResponse.from(user);
 	}
 }

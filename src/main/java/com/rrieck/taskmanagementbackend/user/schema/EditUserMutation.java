@@ -1,8 +1,6 @@
-package com.rrieck.taskmanagementbackend.user.controller;
+package com.rrieck.taskmanagementbackend.user.schema;
 
-import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
-import com.rrieck.taskmanagementbackend.user.model.UserId;
-import com.rrieck.taskmanagementbackend.user.schema.UserTypes;
+import com.rrieck.taskmanagementbackend.common.security.AuthenticatedUser;
 import com.rrieck.taskmanagementbackend.user.service.EditUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -16,11 +14,9 @@ public class EditUserMutation {
 	private final EditUserService editUserService;
 
 	@MutationMapping
-	public UserResponse editUser(@Argument UserTypes.EditUserInput input, Authentication authentication) {
-		UserId userId = UserId.fromString(authentication.getName());
-
+	public UserTypes.UserResponse editUser(@Argument UserTypes.EditUserInput input, Authentication authentication) {
 		return editUserService.edit(
-			userId,
+			AuthenticatedUser.requireUserId(authentication),
 			input.name(),
 			input.email(),
 			input.password()

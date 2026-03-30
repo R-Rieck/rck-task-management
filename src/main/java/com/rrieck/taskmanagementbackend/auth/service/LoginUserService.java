@@ -18,14 +18,14 @@ public class LoginUserService {
 	private final IssueNewTokenPairService issueNewTokenPairService;
 
 	public AuthTypes.AuthResponseType login(String email, String password) {
-		User user = userRepository.findOptByEmail(email).orElseThrow();
 		authenticationManager.authenticate(
 			new UsernamePasswordAuthenticationToken(
-				user.getId(),
+				email,
 				password
 			)
 		);
 
+		User user = userRepository.findOptByEmail(email).orElseThrow();
 		TokenPair tokens = issueNewTokenPairService.issue(user.getId(), user.getLastUsedAccountId());
 
 		return AuthTypes.AuthResponseType

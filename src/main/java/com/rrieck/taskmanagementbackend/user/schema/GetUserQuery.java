@@ -1,7 +1,6 @@
-package com.rrieck.taskmanagementbackend.user.controller;
+package com.rrieck.taskmanagementbackend.user.schema;
 
-import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
-import com.rrieck.taskmanagementbackend.user.model.UserId;
+import com.rrieck.taskmanagementbackend.common.security.AuthenticatedUser;
 import com.rrieck.taskmanagementbackend.user.service.GetUserByIdService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -14,9 +13,7 @@ public class GetUserQuery {
 	private final GetUserByIdService getUserByIdService;
 
 	@QueryMapping
-	public UserResponse me(Authentication authentication) {
-		return getUserByIdService.get(UserId.fromString(authentication.getName()));
+	public UserTypes.UserResponse me(Authentication authentication) {
+		return getUserByIdService.get(AuthenticatedUser.requireUserId(authentication));
 	}
-
-
 }

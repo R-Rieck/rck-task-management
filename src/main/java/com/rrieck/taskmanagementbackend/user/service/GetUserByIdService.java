@@ -1,9 +1,9 @@
 package com.rrieck.taskmanagementbackend.user.service;
 
-import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
+import com.rrieck.taskmanagementbackend.user.schema.UserTypes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 public class GetUserByIdService {
 	private final UserRepository userRepository;
 
-	public UserResponse get(UserId userId) {
+	public UserTypes.UserResponse get(UserId userId) {
 		User user = userRepository
 			.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-		return UserResponse.from(user);
+		return UserTypes.UserResponse.from(user);
 	}
 }

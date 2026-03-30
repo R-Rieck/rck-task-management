@@ -3,8 +3,8 @@ package com.rrieck.taskmanagementbackend.accountMemeber.dto.response;
 import com.rrieck.taskmanagementbackend.account.dto.reponse.AccountResponse;
 import com.rrieck.taskmanagementbackend.account.model.Account;
 import com.rrieck.taskmanagementbackend.auth.model.Role;
-import com.rrieck.taskmanagementbackend.user.dto.UserResponse;
 import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.user.schema.UserTypes;
 import lombok.Builder;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public record AccountMemberResponse(
 					.stream()
 					.map(entry ->
 						MemberWithRole.from(
-							UserResponse.from(entry.getKey()),
+							UserTypes.UserResponse.from(entry.getKey()),
 							entry.getValue()
 						)
 					)
