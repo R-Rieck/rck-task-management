@@ -1,5 +1,9 @@
 package com.rrieck.taskmanagementbackend.auth.service.jwt.token;
 
+import com.rrieck.taskmanagementbackend.account.model.AccountId;
+import com.rrieck.taskmanagementbackend.auth.model.Role;
+import com.rrieck.taskmanagementbackend.auth.model.jwt.JwtClaimKeys;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -30,7 +34,37 @@ public class JwtTokenProvider {
 		           .compact();
 	}
 
-	public Claims extractClaims(
+	public Date extractExpiration(String token, String secret) {
+		Claims claims = extractClaims(token, secret);
+		return claims.getExpiration();
+	}
+
+	public String extractEmail(String token, String secret) {
+		Claims claims = extractClaims(token, secret);
+		return claims.getSubject();
+	}
+
+	public String extractType(String token, String secret) {
+		Claims claims = extractClaims(token, secret);
+		return claims.get(JwtClaimKeys.TYPE, String.class);
+	}
+
+	public UserId extractUserId(String token, String secret) {
+		Claims claims = extractClaims(token, secret);
+		return UserId.fromString(claims.get(JwtClaimKeys.USER_ID, String.class));
+	}
+
+	public AccountId extractAccountId(String token, String secret) {
+		Claims claims = extractClaims(token, secret);
+		return AccountId.fromString(claims.get(JwtClaimKeys.ACCOUNT_ID, String.class));
+	}
+
+	public Role extractRole(String token, String secret) {
+		Claims claims = extractClaims(token, secret);
+		return Role.valueOf(claims.get(JwtClaimKeys.ROLE, String.class));
+	}
+
+	Claims extractClaims(
 		String token,
 		String secret
 	) {

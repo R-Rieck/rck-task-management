@@ -3,3 +3,4 @@ type Mutation
 
 scalar UserId
 scalar AccountId
+scalar AccountMemberId

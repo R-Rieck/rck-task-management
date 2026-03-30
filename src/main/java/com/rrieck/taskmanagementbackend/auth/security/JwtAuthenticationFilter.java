@@ -1,9 +1,12 @@
 package com.rrieck.taskmanagementbackend.auth.security;
 
+import com.rrieck.taskmanagementbackend.account.model.AccountId;
+import com.rrieck.taskmanagementbackend.auth.model.AuthorizationContext;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.accessToken.CheckAccessTokenForValidity;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtProperties;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtTokenProvider;
 import com.rrieck.taskmanagementbackend.auth.service.userDetails.CustomUserDetailsService;
+import com.rrieck.taskmanagementbackend.user.model.UserId;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,24 +43,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		String token = authHeader.substring(7);
-		String userId;
+		String secret = jwtProperties.getAccessToken().getSecret();
+		String email;
+		UserId userId;
+		AccountId accountId;
 
 		try {
-			userId = jwtTokenProvider
-				.extractClaims(token, jwtProperties.getAccessToken().getSecret())
-				.getSubject();
+			email = jwtTokenProvider.extractEmail(token, secret);
+			userId = jwtTokenProvider.extractUserId(token, secret);
+			accountId = jwtTokenProvider.extractAccountId(token, secret);
 		} catch (Exception ex) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
 
-		if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			UserDetails userDetails = userDetailsService.loadUserById(userId);
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			if (checkAccessTokenForValidity.isValid(token, email)) {
+				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+				AuthorizationContext authContext = AuthorizationContext
+					.builder()
+					.userId(userId)
+					.accountId(accountId)
+					.email(email)
+					.build();
 
-			if (checkAccessTokenForValidity.isValid(token, userId)) {
 				UsernamePasswordAuthenticationToken authToken =
 					new UsernamePasswordAuthenticationToken(
-						userDetails,
+						authContext,
 						null,
 						userDetails.getAuthorities()
 					);
@@ -73,6 +85,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		return;
 	}
 }

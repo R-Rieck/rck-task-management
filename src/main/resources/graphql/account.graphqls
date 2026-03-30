@@ -1,0 +1,23 @@
+extend type Query {
+    getMembers: AccountMemberType
+}
+
+type AccountType {
+    id: AccountId!
+    name: String!
+}
+
+type MemberWithRoleType {
+    user: UserType
+    role: Role
+}
+
+type AccountMemberType {
+    account: AccountType
+    member: [MemberWithRoleType]
+}
+
+enum Role {
+    Admin,
+    User
+}

@@ -1,4 +1,4 @@
-package com.rrieck.taskmanagementbackend.account;
+package com.rrieck.taskmanagementbackend.account.exception;
 
 import com.rrieck.taskmanagementbackend.common.error.OutgoingException;
 import org.springframework.http.HttpStatus;

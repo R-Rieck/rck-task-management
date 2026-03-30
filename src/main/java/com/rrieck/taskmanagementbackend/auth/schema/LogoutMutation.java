@@ -1,6 +1,5 @@
-package com.rrieck.taskmanagementbackend.auth.controller;
+package com.rrieck.taskmanagementbackend.auth.schema;
 
-import com.rrieck.taskmanagementbackend.auth.schema.AuthTypes;
 import com.rrieck.taskmanagementbackend.auth.service.LogoutUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;

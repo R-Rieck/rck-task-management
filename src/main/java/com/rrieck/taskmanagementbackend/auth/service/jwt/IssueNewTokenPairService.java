@@ -31,7 +31,12 @@ public class IssueNewTokenPairService {
 
 		deleteAllRefreshTokenForUser.delete(user.getId());
 
-		String accessToken = createAccessToken.create(user.getId(), accountMember.getRole());
+		String accessToken = createAccessToken.create(
+			user.getEmail(),
+			user.getId(),
+			user.getLastUsedAccountId(),
+			accountMember.getRole()
+		);
 		RefreshToken refreshToken = createRefreshToken.create(user.getId());
 
 		return TokenPair.builder()

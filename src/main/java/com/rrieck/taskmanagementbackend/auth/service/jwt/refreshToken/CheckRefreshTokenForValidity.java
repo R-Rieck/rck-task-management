@@ -1,10 +1,8 @@
 package com.rrieck.taskmanagementbackend.auth.service.jwt.refreshToken;
 
-import com.rrieck.taskmanagementbackend.auth.model.jwt.JwtClaimKeys;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenType;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtProperties;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtTokenProvider;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +15,13 @@ public class CheckRefreshTokenForValidity {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	public boolean isValid(String token, String expectedSubject) {
-		Claims claims = jwtTokenProvider.extractClaims(token, jwtProperties.getRefreshToken().getSecret());
-
-		String type = claims.get(JwtClaimKeys.TYPE, String.class);
+		String secret = jwtProperties.getRefreshToken().getSecret();
+		String type = jwtTokenProvider.extractType(token, secret);
+		String email = jwtTokenProvider.extractEmail(token, secret);
+		Date expiration = jwtTokenProvider.extractExpiration(token, secret);
 
 		return TokenType.REFRESH.name().equals(type)
-			&& claims.getSubject().equals(expectedSubject)
-			&& claims.getExpiration().after(new Date());
+			&& email.equals(expectedSubject)
+			&& expiration.after(new Date());
 	}
 }

@@ -1,11 +1,11 @@
 package com.rrieck.taskmanagementbackend.accountMemeber.service;
 
-import com.rrieck.taskmanagementbackend.account.AccountNotFound;
+import com.rrieck.taskmanagementbackend.account.exception.AccountNotFound;
 import com.rrieck.taskmanagementbackend.account.model.Account;
 import com.rrieck.taskmanagementbackend.account.model.AccountId;
-import com.rrieck.taskmanagementbackend.accountMemeber.dto.response.AccountMemberResponse;
 import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMember;
 import com.rrieck.taskmanagementbackend.accountMemeber.repository.AccountMemberRepository;
+import com.rrieck.taskmanagementbackend.accountMemeber.schema.AccountMemberTypes;
 import com.rrieck.taskmanagementbackend.auth.model.Role;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class GetAccountMember {
 	private final AccountMemberRepository accountMemberRepository;
 
-	public AccountMemberResponse get(AccountId accountId) {
+	public AccountMemberTypes.AccountMemberResponse get(AccountId accountId) {
 		List<AccountMember> accountMembers = accountMemberRepository.getAllByAccountId(accountId);
 		Account account = accountMembers
 			.stream()
@@ -45,7 +45,7 @@ public class GetAccountMember {
 			));
 
 
-		return AccountMemberResponse.from(
+		return AccountMemberTypes.AccountMemberResponse.from(
 			account,
 			member
 		);

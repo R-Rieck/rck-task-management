@@ -1,5 +1,5 @@
 extend type Query {
-    me: UserType!
+    me: UserType
 }
 
 extend type Mutation {

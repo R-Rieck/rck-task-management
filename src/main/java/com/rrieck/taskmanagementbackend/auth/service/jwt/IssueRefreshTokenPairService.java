@@ -31,7 +31,12 @@ public class IssueRefreshTokenPairService {
 
 		revokeRefreshToken.revoke(refreshToken);
 
-		String newAccessToken = createAccessToken.create(user.getId(), member.getRole());
+		String newAccessToken = createAccessToken.create(
+			user.getEmail(),
+			user.getId(),
+			user.getLastUsedAccountId(),
+			member.getRole()
+		);
 		RefreshToken newRefreshToken = createRefreshToken.create(user.getId());
 
 		return TokenPair.builder()

@@ -1,5 +1,6 @@
 package com.rrieck.taskmanagementbackend.auth.service.jwt.accessToken;
 
+import com.rrieck.taskmanagementbackend.account.model.AccountId;
 import com.rrieck.taskmanagementbackend.auth.model.Role;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.JwtClaimKeys;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenType;
@@ -18,16 +19,20 @@ public class CreateAccessToken {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	public String create(
+		String email,
 		UserId userId,
+		AccountId accountId,
 		Role role
 	) {
 		return jwtTokenProvider.generateToken(
-			userId.id().toString(),
+			email,
 			jwtProperties.getAccessToken().getSecret(),
 			jwtProperties.getAccessToken().getExpiration(),
 			Map.of(
 				JwtClaimKeys.TYPE, TokenType.ACCESS.name(),
-				JwtClaimKeys.ROLE, role.name()
+				JwtClaimKeys.ROLE, role.name(),
+				JwtClaimKeys.ACCOUNT_ID, accountId,
+				JwtClaimKeys.USER_ID, userId
 			)
 		);
 	}
