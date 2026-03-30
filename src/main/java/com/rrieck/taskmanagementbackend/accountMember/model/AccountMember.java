@@ -1,4 +1,4 @@
-package com.rrieck.taskmanagementbackend.accountMemeber.model;
+package com.rrieck.taskmanagementbackend.accountMember.model;
 
 import com.rrieck.taskmanagementbackend.account.model.Account;
 import com.rrieck.taskmanagementbackend.auth.model.Role;

@@ -1,7 +1,7 @@
 package com.rrieck.taskmanagementbackend.auth.service.userDetails;
 
-import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMember;
-import com.rrieck.taskmanagementbackend.accountMemeber.repository.AccountMemberRepository;
+import com.rrieck.taskmanagementbackend.accountMember.model.AccountMember;
+import com.rrieck.taskmanagementbackend.accountMember.repository.AccountMemberRepository;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

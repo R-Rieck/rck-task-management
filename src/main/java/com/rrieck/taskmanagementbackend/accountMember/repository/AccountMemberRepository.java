@@ -1,8 +1,8 @@
-package com.rrieck.taskmanagementbackend.accountMemeber.repository;
+package com.rrieck.taskmanagementbackend.accountMember.repository;
 
 import com.rrieck.taskmanagementbackend.account.model.AccountId;
-import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMember;
-import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMemberId;
+import com.rrieck.taskmanagementbackend.accountMember.model.AccountMember;
+import com.rrieck.taskmanagementbackend.accountMember.model.AccountMemberId;
 import com.rrieck.taskmanagementbackend.user.model.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 

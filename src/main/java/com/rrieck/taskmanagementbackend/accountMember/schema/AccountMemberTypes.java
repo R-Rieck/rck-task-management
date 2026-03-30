@@ -1,4 +1,4 @@
-package com.rrieck.taskmanagementbackend.accountMemeber.schema;
+package com.rrieck.taskmanagementbackend.accountMember.schema;
 
 import com.rrieck.taskmanagementbackend.account.model.Account;
 import com.rrieck.taskmanagementbackend.account.schema.AccountTypes;

@@ -35,7 +35,7 @@ public class CreateUserService {
 			.builder()
 			.name(name)
 			.id(userId)
-			.email(email)
+			.email(email.toLowerCase().trim())
 			.password(passwordEncoder.encode(password))
 			.registeredAt(LocalDateTime.now())
 			.lastUsedAccountId(accountId)

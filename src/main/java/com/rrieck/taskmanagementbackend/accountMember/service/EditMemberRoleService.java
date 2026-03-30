@@ -1,6 +1,6 @@
-package com.rrieck.taskmanagementbackend.accountMemeber.service;
+package com.rrieck.taskmanagementbackend.accountMember.service;
 
-import com.rrieck.taskmanagementbackend.accountMemeber.repository.AccountMemberRepository;
+import com.rrieck.taskmanagementbackend.accountMember.repository.AccountMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

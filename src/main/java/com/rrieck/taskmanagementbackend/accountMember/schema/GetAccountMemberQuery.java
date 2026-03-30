@@ -1,6 +1,6 @@
-package com.rrieck.taskmanagementbackend.accountMemeber.schema;
+package com.rrieck.taskmanagementbackend.accountMember.schema;
 
-import com.rrieck.taskmanagementbackend.accountMemeber.service.GetAccountMember;
+import com.rrieck.taskmanagementbackend.accountMember.service.GetAccountMember;
 import com.rrieck.taskmanagementbackend.auth.service.AuthorizationWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.QueryMapping;

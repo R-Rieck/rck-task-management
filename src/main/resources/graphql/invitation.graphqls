@@ -1,0 +1,7 @@
+extend type Mutation {
+    invite(emails: [String]): InvitationType
+}
+
+type InvitationType {
+    invitesSent: Int
+}

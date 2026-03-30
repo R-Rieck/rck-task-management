@@ -1,11 +1,11 @@
-package com.rrieck.taskmanagementbackend.accountMemeber.service;
+package com.rrieck.taskmanagementbackend.accountMember.service;
 
 import com.rrieck.taskmanagementbackend.account.model.Account;
 import com.rrieck.taskmanagementbackend.account.model.AccountId;
 import com.rrieck.taskmanagementbackend.account.repository.AccountRepository;
-import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMember;
-import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMemberId;
-import com.rrieck.taskmanagementbackend.accountMemeber.repository.AccountMemberRepository;
+import com.rrieck.taskmanagementbackend.accountMember.model.AccountMember;
+import com.rrieck.taskmanagementbackend.accountMember.model.AccountMemberId;
+import com.rrieck.taskmanagementbackend.accountMember.repository.AccountMemberRepository;
 import com.rrieck.taskmanagementbackend.auth.model.Role;
 import com.rrieck.taskmanagementbackend.user.model.User;
 import com.rrieck.taskmanagementbackend.user.model.UserId;

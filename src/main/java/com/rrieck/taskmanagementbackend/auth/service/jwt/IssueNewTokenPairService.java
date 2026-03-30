@@ -1,8 +1,8 @@
 package com.rrieck.taskmanagementbackend.auth.service.jwt;
 
 import com.rrieck.taskmanagementbackend.account.model.AccountId;
-import com.rrieck.taskmanagementbackend.accountMemeber.model.AccountMember;
-import com.rrieck.taskmanagementbackend.accountMemeber.repository.AccountMemberRepository;
+import com.rrieck.taskmanagementbackend.accountMember.model.AccountMember;
+import com.rrieck.taskmanagementbackend.accountMember.repository.AccountMemberRepository;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.RefreshToken;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.service.jwt.accessToken.CreateAccessToken;
