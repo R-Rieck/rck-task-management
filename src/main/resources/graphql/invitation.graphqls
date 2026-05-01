@@ -1,7 +1,13 @@
 extend type Mutation {
-    invite(emails: [String]): InvitationType
+    invite(emails: [String]): AccountMemberWithInvitationType
+    acceptInviteWithNewUser(invitationToken: ID, name: String, email: String, password: String): AuthType
+    acceptInviteWithExistingUser(invitationToken: ID, userId: UserId): AuthType
 }
 
 type InvitationType {
-    invitesSent: Int
+    id: InvitationId!,
+    InvitationToken: String!,
+    expirationDate: DateTime!,
+    inviteeEmail: String!,
+    invitedByUserId: UserId!
 }

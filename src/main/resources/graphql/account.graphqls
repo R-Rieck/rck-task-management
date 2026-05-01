@@ -1,5 +1,11 @@
 extend type Query {
-    getMembers: AccountMemberType
+    getMembers: AccountMemberWithInvitationType
+    getUserAccounts: [AccountType]
+}
+
+extend type Mutation {
+    editAccountMemberRole(userId: UserId, role: Role): AccountMemberType
+    switchAccount(toAccountId: AccountId): AuthType
 }
 
 type AccountType {
@@ -7,14 +13,17 @@ type AccountType {
     name: String!
 }
 
-type MemberWithRoleType {
+type AccountMemberType {
+    id: AccountMemberId!
     user: UserType
+    account: AccountType
     role: Role
 }
 
-type AccountMemberType {
-    account: AccountType
-    member: [MemberWithRoleType]
+type AccountMemberWithInvitationType {
+    accountName: String!
+    members: [AccountMemberType]
+    openInvitations: [InvitationType]
 }
 
 enum Role {

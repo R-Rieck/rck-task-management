@@ -1,12 +1,12 @@
 package com.rrieck.taskmanagementbackend.auth.security;
 
-import com.rrieck.taskmanagementbackend.account.model.AccountId;
 import com.rrieck.taskmanagementbackend.auth.model.AuthorizationContext;
-import com.rrieck.taskmanagementbackend.auth.service.jwt.accessToken.CheckAccessTokenForValidity;
-import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtProperties;
-import com.rrieck.taskmanagementbackend.auth.service.jwt.token.JwtTokenProvider;
-import com.rrieck.taskmanagementbackend.auth.service.userDetails.CustomUserDetailsService;
-import com.rrieck.taskmanagementbackend.user.model.UserId;
+import com.rrieck.taskmanagementbackend.auth.model.account.AccountId;
+import com.rrieck.taskmanagementbackend.auth.model.user.UserId;
+import com.rrieck.taskmanagementbackend.auth.service.authentication.jwt.accessToken.CheckAccessTokenForValidity;
+import com.rrieck.taskmanagementbackend.auth.service.authentication.jwt.token.JwtProperties;
+import com.rrieck.taskmanagementbackend.auth.service.authentication.jwt.token.JwtTokenProvider;
+import com.rrieck.taskmanagementbackend.auth.service.authentication.userDetails.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,7 +1,7 @@
 package com.rrieck.taskmanagementbackend.auth.repository;
 
 import com.rrieck.taskmanagementbackend.auth.model.jwt.RefreshToken;
-import com.rrieck.taskmanagementbackend.user.model.UserId;
+import com.rrieck.taskmanagementbackend.auth.model.user.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

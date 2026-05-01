@@ -1,6 +1,6 @@
 package com.rrieck.taskmanagementbackend.project.model;
 
-import com.rrieck.taskmanagementbackend.user.model.User;
+import com.rrieck.taskmanagementbackend.auth.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 

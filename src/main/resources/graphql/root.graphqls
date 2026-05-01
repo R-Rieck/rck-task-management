@@ -1,6 +1,9 @@
 type Query
 type Mutation
 
+scalar DateTime
+
 scalar UserId
 scalar AccountId
 scalar AccountMemberId
+scalar InvitationId

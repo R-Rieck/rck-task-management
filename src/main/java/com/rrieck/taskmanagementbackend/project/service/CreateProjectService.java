@@ -1,12 +1,11 @@
 package com.rrieck.taskmanagementbackend.project.service;
 
-import com.rrieck.taskmanagementbackend.project.dto.ProjectResponse;
+import com.rrieck.taskmanagementbackend.auth.model.user.User;
+import com.rrieck.taskmanagementbackend.auth.model.user.UserId;
+import com.rrieck.taskmanagementbackend.auth.repository.UserRepository;
 import com.rrieck.taskmanagementbackend.project.model.Project;
 import com.rrieck.taskmanagementbackend.project.model.ProjectId;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
-import com.rrieck.taskmanagementbackend.user.model.User;
-import com.rrieck.taskmanagementbackend.user.model.UserId;
-import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public class CreateProjectService {
 	private final ProjectRepository projectRepository;
 	private final UserRepository userRepository;
 
-	public ProjectResponse create(String name, Optional<String> description, UserId ownerUserId) {
+	public void create(String name, Optional<String> description, UserId ownerUserId) {
 		User ownerRef = userRepository.getReferenceById(ownerUserId);
 		Project project = Project
 			.builder()
@@ -33,7 +32,5 @@ public class CreateProjectService {
 		description.ifPresent(project::setDescription);
 
 		projectRepository.save(project);
-
-		return ProjectResponse.from(project);
 	}
 }

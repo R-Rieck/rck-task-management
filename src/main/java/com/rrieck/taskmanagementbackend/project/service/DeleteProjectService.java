@@ -1,8 +1,8 @@
 package com.rrieck.taskmanagementbackend.project.service;
 
+import com.rrieck.taskmanagementbackend.auth.repository.UserRepository;
 import com.rrieck.taskmanagementbackend.project.model.ProjectId;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
-import com.rrieck.taskmanagementbackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
