@@ -1,4 +1,8 @@
-HELP.md
+### Node / pnpm ###
+node_modules/
+.pnpm-store/
+
+### Gradle ###
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -35,4 +39,14 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Environment ###
 /.env
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### React / Vite ###
+dist/
+*.tsbuildinfo

@@ -1,0 +1,15 @@
+{
+  "name": "task-management",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n infra,backend,frontend -c yellow,blue,green \"pnpm dev:infra\" \"pnpm dev:backend\" \"pnpm dev:frontend\"",
+    "dev:infra": "docker compose up -d",
+    "dev:backend": "cd apps/backend && ./gradlew bootRun",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm --filter frontend build",
+    "lint": "pnpm --filter frontend lint"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
