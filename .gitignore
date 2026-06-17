@@ -50,3 +50,4 @@ Thumbs.db
 ### React / Vite ###
 dist/
 *.tsbuildinfo
+apps/backend/.env
