@@ -5,6 +5,7 @@ extend type Query {
 
 extend type Mutation {
     editAccountMemberRole(userId: UserId, role: Role): AccountMemberType
+    removeAccountMember(userId: UserId): Boolean!
     switchAccount(toAccountId: AccountId): AuthType
 }
 
