@@ -75,6 +75,12 @@ export const GET_USER_ACCOUNTS = gql`
   }
 `
 
+export const REMOVE_INVITATION = gql`
+  mutation RemoveInvitation($invitationId: InvitationId!) {
+    removeInvitation(invitationId: $invitationId)
+  }
+`
+
 export const SWITCH_ACCOUNT = gql`
   mutation SwitchAccount($toAccountId: AccountId!) {
     switchAccount(toAccountId: $toAccountId) {

@@ -15,7 +15,7 @@ import {
   Popconfirm,
 } from 'antd'
 import { MailOutlined, UserAddOutlined, DeleteOutlined } from '@ant-design/icons'
-import { GET_MEMBERS, INVITE, EDIT_MEMBER_ROLE, REMOVE_MEMBER } from '../graphql/account'
+import { GET_MEMBERS, INVITE, EDIT_MEMBER_ROLE, REMOVE_MEMBER, REMOVE_INVITATION } from '../graphql/account'
 import { AppLayout } from '../components/AppLayout'
 import { useAuth } from '../auth/AuthContext'
 
@@ -27,6 +27,7 @@ export function AccountSettings() {
   const [inviteMutation, { loading: inviting }] = useMutation(INVITE)
   const [editRoleMutation] = useMutation(EDIT_MEMBER_ROLE)
   const [removeMutation] = useMutation(REMOVE_MEMBER)
+  const [removeInvitationMutation] = useMutation(REMOVE_INVITATION)
   const [inviteForm] = Form.useForm()
   const [members, setMembers] = useState<Member[]>([])
   const [invitations, setInvitations] = useState<Invitation[]>([])
@@ -69,6 +70,17 @@ export function AccountSettings() {
       message.success('Role updated')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to update role'
+      message.error(msg)
+    }
+  }
+
+  const handleRemoveInvitation = async (invitationId: string) => {
+    try {
+      await removeInvitationMutation({ variables: { invitationId } })
+      setInvitations((prev) => prev.filter((i) => i.id !== invitationId))
+      message.success('Invitation revoked')
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to revoke invitation'
       message.error(msg)
     }
   }
@@ -195,6 +207,26 @@ export function AccountSettings() {
         return <span>{days}d {hours}h remaining</span>
       },
     },
+    ...(currentUserRole === 'Admin'
+      ? [
+          {
+            title: 'Actions',
+            key: 'actions',
+            render: (_: unknown, record: Invitation) => (
+              <Popconfirm
+                title="Revoke this invitation?"
+                onConfirm={() => handleRemoveInvitation(record.id)}
+                okText="Revoke"
+                okButtonProps={{ danger: true }}
+              >
+                <Button type="text" danger icon={<DeleteOutlined />} size="small">
+                  Revoke
+                </Button>
+              </Popconfirm>
+            ),
+          },
+        ]
+      : []),
   ]
 
   return (
