@@ -1,5 +1,6 @@
 package com.rrieck.taskmanagementbackend.common.config;
 
+import com.rrieck.taskmanagementbackend.auth.exception.refreshToken.RefreshTokenException;
 import com.rrieck.taskmanagementbackend.common.error.OutgoingException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
@@ -14,6 +15,21 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GraphQlExceptionHandlerAdvice {
+
+	@GraphQlExceptionHandler(RefreshTokenException.class)
+	public GraphQLError handleRefreshTokenException(
+		RefreshTokenException exception,
+		DataFetchingEnvironment environment
+	) {
+		return GraphqlErrorBuilder.newError(environment)
+		                          .errorType(ErrorType.UNAUTHORIZED)
+		                          .message(exception.getMessage())
+		                          .extensions(Map.of(
+			                          "code", exception.getErrorCode(),
+			                          "httpStatus", 401
+		                          ))
+		                          .build();
+	}
 
 	@GraphQlExceptionHandler(OutgoingException.class)
 	public GraphQLError handleOutgoingException(

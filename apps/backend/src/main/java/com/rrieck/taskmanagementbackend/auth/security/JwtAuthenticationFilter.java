@@ -53,37 +53,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			userId = jwtTokenProvider.extractUserId(token, secret);
 			accountId = jwtTokenProvider.extractAccountId(token, secret);
 		} catch (Exception ex) {
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			filterChain.doFilter(request, response);
 			return;
 		}
 
-		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			if (checkAccessTokenForValidity.isValid(token, email)) {
-				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-				AuthorizationContext authContext = AuthorizationContext
-					.builder()
-					.userId(userId)
-					.accountId(accountId)
-					.email(email)
-					.build();
+		if (SecurityContextHolder.getContext().getAuthentication() == null
+			&& checkAccessTokenForValidity.isValid(token, email)) {
+			UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+			AuthorizationContext authContext = AuthorizationContext
+				.builder()
+				.userId(userId)
+				.accountId(accountId)
+				.email(email)
+				.build();
 
-				UsernamePasswordAuthenticationToken authToken =
-					new UsernamePasswordAuthenticationToken(
-						authContext,
-						null,
-						userDetails.getAuthorities()
-					);
-
-				authToken.setDetails(
-					new WebAuthenticationDetailsSource().buildDetails(request)
+			UsernamePasswordAuthenticationToken authToken =
+				new UsernamePasswordAuthenticationToken(
+					authContext,
+					null,
+					userDetails.getAuthorities()
 				);
 
-				SecurityContextHolder.getContext().setAuthentication(authToken);
-				filterChain.doFilter(request, response);
-				return;
-			}
+			authToken.setDetails(
+				new WebAuthenticationDetailsSource().buildDetails(request)
+			);
+
+			SecurityContextHolder.getContext().setAuthentication(authToken);
 		}
 
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		filterChain.doFilter(request, response);
 	}
 }

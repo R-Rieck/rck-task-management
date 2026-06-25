@@ -8,8 +8,10 @@ import com.rrieck.taskmanagementbackend.auth.model.account.AccountId;
 import com.rrieck.taskmanagementbackend.auth.model.accountMember.AccountMember;
 import com.rrieck.taskmanagementbackend.auth.model.user.UserId;
 import com.rrieck.taskmanagementbackend.auth.repository.AccountMemberRepository;
+import com.rrieck.taskmanagementbackend.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RemoveAccountMemberService {
 	private final AccountMemberRepository accountMemberRepository;
+	private final UserRepository userRepository;
 
+	@Transactional
 	public boolean remove(AccountId accountId, UserId targetUserId, UserId requestingUserId) {
 		boolean isRemovingSelf = targetUserId.equals(requestingUserId);
 
@@ -45,6 +49,17 @@ public class RemoveAccountMemberService {
 		}
 
 		accountMemberRepository.delete(member);
+
+		List<AccountMember> remainingMemberships = accountMemberRepository.getAllByUserId(targetUserId);
+
+		if (!remainingMemberships.isEmpty()) {
+			AccountId newAccountId = remainingMemberships.get(0).getAccount().getId();
+			userRepository.getOptById(targetUserId).ifPresent(user -> {
+				user.setLastUsedAccountId(newAccountId);
+				userRepository.save(user);
+			});
+		}
+
 		return true;
 	}
 }

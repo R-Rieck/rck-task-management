@@ -1,5 +1,9 @@
 package com.rrieck.taskmanagementbackend.auth.service.authentication;
 
+import com.rrieck.taskmanagementbackend.auth.exception.refreshToken.RefreshTokenExpired;
+import com.rrieck.taskmanagementbackend.auth.exception.refreshToken.RefreshTokenInvalid;
+import com.rrieck.taskmanagementbackend.auth.exception.refreshToken.RefreshTokenNotFound;
+import com.rrieck.taskmanagementbackend.auth.exception.refreshToken.RefreshTokenRevoked;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.RefreshToken;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.model.user.User;
@@ -18,19 +22,20 @@ public class RefreshAuthenticationService {
 	private final CheckRefreshTokenForValidity checkRefreshTokenForValidity;
 
 	public AuthTypes.AuthType refresh(String refreshToken) {
-		RefreshToken existingRefreshToken = refreshTokenRepository.findByToken(refreshToken).orElseThrow();
+		RefreshToken existingRefreshToken = refreshTokenRepository.findByToken(refreshToken)
+			.orElseThrow(() -> new RefreshTokenNotFound(refreshToken));
 		User user = existingRefreshToken.getUser();
 
 		if (existingRefreshToken.isRevoked()) {
-			throw new IllegalArgumentException("Refresh token is revoked");
+			throw new RefreshTokenRevoked();
 		}
 
 		if (existingRefreshToken.getExpiration().isBefore(java.time.LocalDateTime.now())) {
-			throw new IllegalArgumentException("Refresh token is expired");
+			throw new RefreshTokenExpired();
 		}
 
 		if (!checkRefreshTokenForValidity.isValid(refreshToken, user.getId().id().toString())) {
-			throw new IllegalArgumentException("Invalid refresh token");
+			throw new RefreshTokenInvalid();
 		}
 
 		TokenPair newTokens = issueRefreshTokenPairService.issue(user.getId(), existingRefreshToken);

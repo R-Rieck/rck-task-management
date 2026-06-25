@@ -54,6 +54,17 @@ export const EDIT_USER = gql`
   }
 `
 
+export const REFRESH = gql`
+  mutation Refresh($input: RefreshAuthenticationInput!) {
+    refresh(input: $input) {
+      accessToken
+      refreshToken
+      userId
+      accountId
+    }
+  }
+`
+
 export const ME = gql`
   query Me {
     me {

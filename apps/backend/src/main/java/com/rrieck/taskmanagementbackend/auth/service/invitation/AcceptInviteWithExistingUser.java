@@ -7,6 +7,7 @@ import com.rrieck.taskmanagementbackend.auth.model.invitation.Invitation;
 import com.rrieck.taskmanagementbackend.auth.model.jwt.TokenPair;
 import com.rrieck.taskmanagementbackend.auth.model.user.UserId;
 import com.rrieck.taskmanagementbackend.auth.repository.InvitationRepository;
+import com.rrieck.taskmanagementbackend.auth.repository.UserRepository;
 import com.rrieck.taskmanagementbackend.auth.schema.authentication.AuthTypes;
 import com.rrieck.taskmanagementbackend.auth.service.accountMember.CreateAccountMember;
 import com.rrieck.taskmanagementbackend.auth.service.authentication.jwt.IssueNewTokenPairService;
@@ -21,6 +22,7 @@ public class AcceptInviteWithExistingUser {
 	private final InvitationRepository invitationRepository;
 	private final CreateAccountMember createAccountMember;
 	private final IssueNewTokenPairService issueNewTokenPairService;
+	private final UserRepository userRepository;
 
 	public AuthTypes.AuthType accept(UUID invitationToken, UserId userId) {
 		Invitation invitation = invitationRepository
@@ -38,6 +40,10 @@ public class AcceptInviteWithExistingUser {
 		);
 
 		invitationRepository.delete(invitation);
+
+		var user = userRepository.getOptById(userId).orElseThrow();
+		user.setLastUsedAccountId(invitation.getInvitedByAccount());
+		userRepository.save(user);
 
 		TokenPair tokens = issueNewTokenPairService.issue(userId, invitation.getInvitedByAccount());
 

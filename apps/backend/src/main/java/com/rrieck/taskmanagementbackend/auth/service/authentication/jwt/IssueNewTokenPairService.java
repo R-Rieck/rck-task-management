@@ -34,7 +34,7 @@ public class IssueNewTokenPairService {
 		String accessToken = createAccessToken.create(
 			user.getEmail(),
 			user.getId(),
-			user.getLastUsedAccountId(),
+			accountId,
 			accountMember.getRole()
 		);
 		RefreshToken refreshToken = createRefreshToken.create(user.getId());

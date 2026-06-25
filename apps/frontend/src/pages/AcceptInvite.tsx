@@ -22,9 +22,26 @@ export function AcceptInvite() {
   const [loginMutation] = useMutation(LOGIN)
 
   if (authLoading) return null
-  if (user) {
-    navigate('/', { replace: true })
-    return null
+
+  const handleJoinAsExistingUser = async () => {
+    if (!token || !user) return
+    setSubmitting(true)
+    try {
+      const result = await acceptExisting({
+        variables: { invitationToken: token, userId: user.id },
+      })
+      const { accessToken, refreshToken } = result.data.acceptInviteWithExistingUser
+      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
+
+      await client.query({ query: ME, fetchPolicy: 'network-only' })
+      navigate('/', { replace: true })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to accept invitation'
+      message.error(msg)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleCreateAndJoin = async (values: { name: string; email: string; password: string }) => {
@@ -144,6 +161,39 @@ export function AcceptInvite() {
       ),
     },
   ]
+
+  if (user) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: '#f0f2f5',
+        }}
+      >
+        <Card style={{ width: 440 }}>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <div style={{ textAlign: 'center' }}>
+              <Title level={3}>Join Your Team</Title>
+              <Text type="secondary">
+                You're signed in as {user.email}. Would you like to join this account?
+              </Text>
+            </div>
+
+            <Button type="primary" block size="large" loading={submitting} onClick={handleJoinAsExistingUser}>
+              Join Account
+            </Button>
+
+            <div style={{ textAlign: 'center' }}>
+              <Link to="/">Back to Dashboard</Link>
+            </div>
+          </Space>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div
