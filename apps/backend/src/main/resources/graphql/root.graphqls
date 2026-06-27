@@ -8,3 +8,5 @@ scalar AccountId
 scalar AccountMemberId
 scalar InvitationId
 scalar ProjectId
+scalar BoardId
+scalar BoardSectionId

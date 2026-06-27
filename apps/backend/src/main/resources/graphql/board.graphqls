@@ -1,0 +1,28 @@
+extend type Query {
+    boards(projectId: ProjectId!): [BoardType!]!
+}
+
+extend type Mutation {
+    createBoard(input: CreateBoardInput!): BoardType!
+    deleteBoard(boardId: BoardId!): Boolean!
+}
+
+type BoardType {
+    id: BoardId!
+    name: String!
+    sections: [BoardSectionType!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type BoardSectionType {
+    id: BoardSectionId!
+    name: String!
+    position: Int!
+}
+
+input CreateBoardInput {
+    projectId: ProjectId!
+    name: String!
+    sections: [String!]!
+}
