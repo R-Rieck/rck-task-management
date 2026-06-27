@@ -1,9 +1,8 @@
-import { ApolloClient, InMemoryCache, ApolloLink } from '@apollo/client/core'
+import { ApolloClient, InMemoryCache, ApolloLink, Observable } from '@apollo/client'
 import { HttpLink } from '@apollo/client/link/http'
 import { setContext } from '@apollo/client/link/context'
-import { ErrorLink } from '@apollo/client/link/error'
+import { onError } from '@apollo/client/link/error'
 import { CombinedGraphQLErrors } from '@apollo/client/errors'
-import { Observable } from 'rxjs'
 
 const httpLink = new HttpLink({ uri: '/graphql' })
 
@@ -34,6 +33,10 @@ async function performRefresh(): Promise<void> {
     }),
   })
 
+  if (!response.ok) {
+    throw new Error(`Refresh failed with status ${response.status}`)
+  }
+
   const json = await response.json()
   if (json.errors) throw new Error(json.errors[0].message)
 
@@ -42,20 +45,20 @@ async function performRefresh(): Promise<void> {
   localStorage.setItem('refreshToken', newRefreshToken)
 }
 
-const errorLink = new ErrorLink(({ error, operation, forward }) => {
+const errorLink = onError(({ error, operation, forward }) => {
   const isAuthError = CombinedGraphQLErrors.is(error) &&
-    error.errors.some((err) => err.extensions?.httpStatus === 401)
+    error.errors.some((err) => err.extensions?.['httpStatus'] === 401)
 
   if (!isAuthError) return
   if (!localStorage.getItem('refreshToken')) return
 
   if (!refreshPromise) {
-    refreshPromise = performRefresh().catch((_err: unknown) => {
+    refreshPromise = performRefresh().catch((err: unknown) => {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
       localStorage.removeItem('currentAccountId')
       window.location.href = '/login'
-      throw _err
+      throw err
     }).finally(() => {
       refreshPromise = null
     })
@@ -74,7 +77,7 @@ const errorLink = new ErrorLink(({ error, operation, forward }) => {
         }))
       })
       .then(() => forward(operation).subscribe(observer))
-      .catch((_err: unknown) => observer.error(_err))
+      .catch((err: unknown) => observer.error(err))
   })
 })
 
