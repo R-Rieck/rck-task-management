@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { Layout, Menu, Typography, Tree, Button, Modal, Form, Input, Switch, Spin, message, Dropdown } from 'antd'
+import { Layout, Menu, Typography, Tree, Button, Modal, Form, Input, Switch, Spin, message, Dropdown, ConfigProvider } from 'antd'
 import {
   DashboardOutlined,
   FolderOutlined,
@@ -199,15 +199,29 @@ export function AppLayout({ children }: { children: ReactNode }) {
             {projectsLoading ? (
               <Spin size="small" style={{ display: 'block', margin: '16px auto' }} />
             ) : (
-              <Tree
-                treeData={treeData}
-                style={{ color: '#fff', background: 'transparent' }}
-                styles={{
-                  root: { background: 'transparent' },
-                  itemTitle: { background: 'transparent' },
-                  item: { background: 'transparent' },
+              <ConfigProvider
+                theme={{
+                  components: {
+                    Tree: {
+                      nodeSelectedBg: 'rgba(255,255,255,0.1)',
+                      nodeSelectedColor: '#fff',
+                      nodeHoverBg: 'rgba(255,255,255,0.06)',
+                      nodeHoverColor: 'rgba(255,255,255,0.85)',
+                    },
+                  },
                 }}
-              />
+              >
+                <Tree
+                  treeData={treeData}
+                  blockNode
+                  style={{ color: '#fff', background: 'transparent' }}
+                  styles={{
+                    root: { background: 'transparent' },
+                    itemTitle: { background: 'transparent', width: '100%' },
+                    item: { background: 'transparent', width: '100%' },
+                  }}
+                />
+              </ConfigProvider>
             )}
           </div>
 

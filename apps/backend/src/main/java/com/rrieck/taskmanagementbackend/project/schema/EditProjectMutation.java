@@ -1,10 +1,7 @@
 package com.rrieck.taskmanagementbackend.project.schema;
 
-import com.rrieck.taskmanagementbackend.auth.exception.accountMember.AccountMemberNotAdmin;
-import com.rrieck.taskmanagementbackend.auth.model.Role;
-import com.rrieck.taskmanagementbackend.auth.model.user.UserId;
-import com.rrieck.taskmanagementbackend.auth.repository.AccountMemberRepository;
 import com.rrieck.taskmanagementbackend.auth.service.authentication.AuthorizationWrapper;
+import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
 import com.rrieck.taskmanagementbackend.project.service.EditProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -16,27 +13,23 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class EditProjectMutation {
 	private final EditProjectService editProjectService;
-	private final AccountMemberRepository accountMemberRepository;
+	private final ProjectRepository projectRepository;
 
 	@MutationMapping
 	public ProjectTypes.ProjectType editProject(@Argument ProjectTypes.EditProjectInput input, Authentication auth) {
 		return AuthorizationWrapper.authenticated(auth, ctx -> {
-			var requester = accountMemberRepository
-				.getOptByAccountIdAndUserId(ctx.accountId(), ctx.userId())
-				.orElseThrow();
+			var project = projectRepository.findById(input.projectId()).orElseThrow();
 
-			if (requester.getRole() != Role.Admin
-				&& !ctx.userId().id().equals(input.projectId().id())) {
-				throw new AccountMemberNotAdmin();
-			}
+			boolean isOwner = project.getOwner().getId().id().equals(ctx.userId().id());
 
-			var project = editProjectService.edit(
+			var updated = editProjectService.edit(
 				input.projectId(),
 				input.name(),
 				input.description(),
-				input.isPrivate()
+				isOwner ? input.isPrivate() : project.isPrivate()
 			);
-			return ProjectTypes.ProjectType.from(project);
+
+			return ProjectTypes.ProjectType.from(updated);
 		});
 	}
 }
