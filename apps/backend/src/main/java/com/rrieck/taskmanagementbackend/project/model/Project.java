@@ -1,5 +1,6 @@
 package com.rrieck.taskmanagementbackend.project.model;
 
+import com.rrieck.taskmanagementbackend.auth.model.account.AccountId;
 import com.rrieck.taskmanagementbackend.auth.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,6 +32,13 @@ public class Project {
 		foreignKey = @ForeignKey(name = "fk_project_user")
 	)
 	private User owner;
+
+	@Embedded
+	@AttributeOverride(name = "id", column = @Column(name = "account_id", nullable = false))
+	private AccountId account;
+
+	@Column(name = "is_private", nullable = false)
+	private boolean isPrivate;
 
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;

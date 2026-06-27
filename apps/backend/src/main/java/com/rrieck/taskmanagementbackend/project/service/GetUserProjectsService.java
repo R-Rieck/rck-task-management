@@ -1,18 +1,20 @@
 package com.rrieck.taskmanagementbackend.project.service;
 
+import com.rrieck.taskmanagementbackend.auth.model.account.AccountId;
+import com.rrieck.taskmanagementbackend.auth.model.user.UserId;
 import com.rrieck.taskmanagementbackend.project.model.Project;
-import com.rrieck.taskmanagementbackend.project.model.ProjectId;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-public class DeleteProjectService {
+public class GetUserProjectsService {
 	private final ProjectRepository projectRepository;
 
-	public void delete(ProjectId projectId) {
-		Project project = projectRepository.findById(projectId).orElseThrow();
-		projectRepository.delete(project);
+	public List<Project> getProjects(AccountId accountId, UserId userId) {
+		return projectRepository.findAccessibleByAccount(accountId.id(), userId.id());
 	}
 }

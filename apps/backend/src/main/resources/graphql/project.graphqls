@@ -1,0 +1,31 @@
+extend type Query {
+    projects: [ProjectType!]!
+}
+
+extend type Mutation {
+    createProject(input: CreateProjectInput!): ProjectType!
+    editProject(input: EditProjectInput!): ProjectType!
+    deleteProject(projectId: ProjectId!): Boolean!
+}
+
+type ProjectType {
+    id: ProjectId!
+    name: String!
+    description: String
+    isPrivate: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+input CreateProjectInput {
+    name: String!
+    description: String
+    isPrivate: Boolean
+}
+
+input EditProjectInput {
+    projectId: ProjectId!
+    name: String!
+    description: String
+    isPrivate: Boolean!
+}
