@@ -20,6 +20,7 @@ public class CreateProjectMutation {
 				input.name(),
 				input.description(),
 				input.isPrivate() != null && input.isPrivate(),
+				input.icon(),
 				ctx.accountId(),
 				ctx.userId()
 			);

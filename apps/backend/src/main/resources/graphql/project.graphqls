@@ -13,6 +13,7 @@ type ProjectType {
     name: String!
     description: String
     isPrivate: Boolean!
+    icon: String
     createdAt: DateTime!
     updatedAt: DateTime!
 }
@@ -21,6 +22,7 @@ input CreateProjectInput {
     name: String!
     description: String
     isPrivate: Boolean
+    icon: String
 }
 
 input EditProjectInput {
@@ -28,4 +30,5 @@ input EditProjectInput {
     name: String!
     description: String
     isPrivate: Boolean!
+    icon: String
 }

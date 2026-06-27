@@ -13,12 +13,13 @@ import java.time.LocalDateTime;
 public class EditProjectService {
 	private final ProjectRepository projectRepository;
 
-	public Project edit(ProjectId projectId, String newName, String description, boolean isPrivate) {
+	public Project edit(ProjectId projectId, String newName, String description, boolean isPrivate, String icon) {
 		Project existingProject = projectRepository.findById(projectId).orElseThrow();
 
 		existingProject.setName(newName);
 		existingProject.setDescription(description);
 		existingProject.setPrivate(isPrivate);
+		existingProject.setIcon(icon);
 		existingProject.setUpdatedAt(LocalDateTime.now());
 
 		return projectRepository.save(existingProject);

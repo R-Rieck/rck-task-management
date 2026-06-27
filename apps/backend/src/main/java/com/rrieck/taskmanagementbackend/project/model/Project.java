@@ -40,6 +40,9 @@ public class Project {
 	@Column(name = "is_private", nullable = false)
 	private boolean isPrivate;
 
+	@Column(nullable = true)
+	private String icon;
+
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 

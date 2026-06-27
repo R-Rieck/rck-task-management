@@ -7,6 +7,7 @@ export const GET_PROJECTS = gql`
       name
       description
       isPrivate
+      icon
       createdAt
       updatedAt
     }
@@ -20,6 +21,7 @@ export const CREATE_PROJECT = gql`
       name
       description
       isPrivate
+      icon
       createdAt
       updatedAt
     }
@@ -33,6 +35,7 @@ export const EDIT_PROJECT = gql`
       name
       description
       isPrivate
+      icon
       createdAt
       updatedAt
     }

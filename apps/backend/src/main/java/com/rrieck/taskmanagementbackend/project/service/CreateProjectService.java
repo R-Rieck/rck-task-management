@@ -18,7 +18,7 @@ public class CreateProjectService {
 	private final ProjectRepository projectRepository;
 	private final UserRepository userRepository;
 
-	public Project create(String name, String description, boolean isPrivate, AccountId accountId, UserId ownerUserId) {
+	public Project create(String name, String description, boolean isPrivate, String icon, AccountId accountId, UserId ownerUserId) {
 		User ownerRef = userRepository.getReferenceById(ownerUserId);
 		Project project = Project
 			.builder()
@@ -26,6 +26,7 @@ public class CreateProjectService {
 			.name(name)
 			.description(description)
 			.isPrivate(isPrivate)
+			.icon(icon)
 			.account(accountId)
 			.owner(ownerRef)
 			.createdAt(LocalDateTime.now())

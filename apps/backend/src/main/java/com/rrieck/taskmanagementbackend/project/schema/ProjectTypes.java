@@ -13,6 +13,7 @@ public class ProjectTypes {
 		String name,
 		String description,
 		boolean isPrivate,
+		String icon,
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt
 	) {
@@ -22,6 +23,7 @@ public class ProjectTypes {
 			                  .name(project.getName())
 			                  .description(project.getDescription())
 			                  .isPrivate(project.isPrivate())
+			                  .icon(project.getIcon())
 			                  .createdAt(project.getCreatedAt())
 			                  .updatedAt(project.getUpdatedAt())
 			                  .build();
@@ -31,13 +33,15 @@ public class ProjectTypes {
 	public record CreateProjectInput(
 		String name,
 		String description,
-		Boolean isPrivate
+		Boolean isPrivate,
+		String icon
 	) {}
 
 	public record EditProjectInput(
 		ProjectId projectId,
 		String name,
 		String description,
-		boolean isPrivate
+		boolean isPrivate,
+		String icon
 	) {}
 }

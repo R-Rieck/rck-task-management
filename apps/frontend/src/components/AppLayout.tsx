@@ -3,6 +3,17 @@ import { Layout, Menu, Typography, Tree, Button, Modal, Form, Input, Switch, Spi
 import {
   DashboardOutlined,
   FolderOutlined,
+  StarOutlined,
+  HeartOutlined,
+  BookOutlined,
+  SettingOutlined,
+  FlagOutlined,
+  HomeOutlined,
+  CodeOutlined,
+  MailOutlined,
+  FileOutlined,
+  RocketOutlined,
+  SmileOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
@@ -20,12 +31,53 @@ import { GET_USER_ACCOUNTS } from '../graphql/account'
 
 const { Sider, Content } = Layout
 
+const PROJECT_ICONS: Record<string, React.ReactNode> = {
+  FolderOutlined: <FolderOutlined />,
+  StarOutlined: <StarOutlined />,
+  HeartOutlined: <HeartOutlined />,
+  BookOutlined: <BookOutlined />,
+  SettingOutlined: <SettingOutlined />,
+  FlagOutlined: <FlagOutlined />,
+  HomeOutlined: <HomeOutlined />,
+  CodeOutlined: <CodeOutlined />,
+  MailOutlined: <MailOutlined />,
+  FileOutlined: <FileOutlined />,
+  RocketOutlined: <RocketOutlined />,
+  SmileOutlined: <SmileOutlined />,
+}
+
+function renderIcon(iconName: string | null | undefined) {
+  return iconName && PROJECT_ICONS[iconName] ? PROJECT_ICONS[iconName] : <FolderOutlined />
+}
+
+function IconPicker({ value, onChange }: { value?: string | null; onChange?: (val: string) => void }) {
+  const iconNames = Object.keys(PROJECT_ICONS)
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+      {iconNames.map((name) => (
+        <div
+          key={name}
+          onClick={() => onChange?.(name)}
+          style={{
+            width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            borderRadius: 4, cursor: 'pointer', fontSize: 18,
+            border: value === name ? '2px solid #1677ff' : '2px solid transparent',
+            background: value === name ? '#e6f4ff' : '#f5f5f5',
+          }}
+        >
+          {PROJECT_ICONS[name]}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function ProjectNodeTitle({
   project,
   onEdit,
   onDelete,
 }: {
-  project: { id: string; name: string }
+  project: { id: string; name: string; icon: string | null }
   onEdit: () => void
   onDelete: () => void
 }) {
@@ -42,7 +94,9 @@ function ProjectNodeTitle({
       onMouseLeave={() => setHovered(false)}
       style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 4 }}
     >
-      <FolderOutlined style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14, flexShrink: 0 }} />
+      <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14, flexShrink: 0, lineHeight: 1 }}>
+        {renderIcon(project.icon)}
+      </span>
       <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {project.name}
       </span>
@@ -92,10 +146,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const [createOpen, setCreateOpen] = useState(false)
   const [createForm] = Form.useForm()
-  const [editingProject, setEditingProject] = useState<{ id: string; name: string; description: string | null; isPrivate: boolean } | null>(null)
+  const [editingProject, setEditingProject] = useState<{ id: string; name: string; description: string | null; isPrivate: boolean; icon: string | null } | null>(null)
   const [editForm] = Form.useForm()
 
-  const handleCreate = async (values: { name: string; description?: string; isPrivate?: boolean }) => {
+  const handleCreate = async (values: { name: string; description?: string; isPrivate?: boolean; icon?: string }) => {
     try {
       await createProject({
         variables: {
@@ -103,6 +157,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             name: values.name,
             description: values.description || null,
             isPrivate: values.isPrivate ?? false,
+            icon: values.icon || null,
           },
         },
       })
@@ -114,7 +169,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const handleEdit = async (values: { name: string; description?: string; isPrivate: boolean }) => {
+  const handleEdit = async (values: { name: string; description?: string; isPrivate: boolean; icon?: string }) => {
     if (!editingProject) return
     try {
       await editProject({
@@ -124,6 +179,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             name: values.name,
             description: values.description || null,
             isPrivate: values.isPrivate,
+            icon: values.icon || null,
           },
         },
       })
@@ -144,14 +200,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const treeData = projects.map((p: { id: string; name: string; description: string | null; isPrivate: boolean }) => ({
+  const treeData = projects.map((p: { id: string; name: string; description: string | null; isPrivate: boolean; icon: string | null }) => ({
     key: p.id,
     title: (
       <ProjectNodeTitle
         project={p}
         onEdit={() => {
           setEditingProject(p)
-          editForm.setFieldsValue({ name: p.name, description: p.description, isPrivate: p.isPrivate })
+          editForm.setFieldsValue({ name: p.name, description: p.description, isPrivate: p.isPrivate, icon: p.icon })
         }}
         onDelete={() => handleDelete(p.id)}
       />
@@ -267,6 +323,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Form.Item name="description" label="Description">
             <Input.TextArea rows={3} placeholder="Optional description" />
           </Form.Item>
+          <Form.Item name="icon" label="Icon">
+            <IconPicker />
+          </Form.Item>
           <Form.Item name="isPrivate" label="Private project" valuePropName="checked">
             <Switch />
           </Form.Item>
@@ -286,6 +345,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Form.Item>
           <Form.Item name="description" label="Description">
             <Input.TextArea rows={3} placeholder="Optional description" />
+          </Form.Item>
+          <Form.Item name="icon" label="Icon">
+            <IconPicker />
           </Form.Item>
           <Form.Item name="isPrivate" label="Private project" valuePropName="checked">
             <Switch />

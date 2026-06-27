@@ -26,7 +26,8 @@ public class EditProjectMutation {
 				input.projectId(),
 				input.name(),
 				input.description(),
-				isOwner ? input.isPrivate() : project.isPrivate()
+				isOwner ? input.isPrivate() : project.isPrivate(),
+				input.icon()
 			);
 
 			return ProjectTypes.ProjectType.from(updated);
