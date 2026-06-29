@@ -14,6 +14,7 @@ import {
   FileOutlined,
   RocketOutlined,
   SmileOutlined,
+  ProjectOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
@@ -27,6 +28,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { UserMenu } from './UserMenu'
 import { useAuth } from '../auth/AuthContext'
 import { GET_PROJECTS, CREATE_PROJECT, EDIT_PROJECT, DELETE_PROJECT } from '../graphql/project'
+import { CREATE_BOARD } from '../graphql/board'
 import { GET_USER_ACCOUNTS } from '../graphql/account'
 
 const { Sider, Content } = Layout
@@ -76,14 +78,18 @@ function ProjectNodeTitle({
   project,
   onEdit,
   onDelete,
+  onCreateBoard,
 }: {
   project: { id: string; name: string; icon: string | null }
   onEdit: () => void
   onDelete: () => void
+  onCreateBoard: () => void
 }) {
   const [hovered, setHovered] = useState(false)
 
   const dropdownItems = [
+    { key: 'createBoard', icon: <PlusOutlined />, label: 'Create Board' },
+    { type: 'divider' as const },
     { key: 'edit', icon: <EditOutlined />, label: 'Edit' },
     { key: 'delete', icon: <DeleteOutlined />, label: 'Delete', danger: true },
   ]
@@ -108,7 +114,8 @@ function ProjectNodeTitle({
           menu={{
             items: dropdownItems,
             onClick: ({ key }) => {
-              if (key === 'edit') onEdit()
+              if (key === 'createBoard') onCreateBoard()
+              else if (key === 'edit') onEdit()
               else if (key === 'delete') {
                 Modal.confirm({
                   title: 'Delete this project?',
@@ -139,17 +146,22 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [createProject] = useMutation(CREATE_PROJECT, { refetchQueries: ['Projects'] })
   const [editProject] = useMutation(EDIT_PROJECT, { refetchQueries: ['Projects'] })
   const [deleteProject] = useMutation(DELETE_PROJECT, { refetchQueries: ['Projects'] })
+  const [createBoard] = useMutation(CREATE_BOARD, { refetchQueries: ['Projects'] })
 
-  const projects = (projectsData as { projects: any[] } | undefined)?.projects ?? []
+  const projects = (projectsData as any)?.projects ?? []
   const accounts = (accountsData as { getUserAccounts: Array<{ id: string; name: string }> } | undefined)?.getUserAccounts ?? []
   const currentAccount = accounts.find((a) => a.id === currentAccountId)
 
   const [createOpen, setCreateOpen] = useState(false)
   const [createForm] = Form.useForm()
-  const [editingProject, setEditingProject] = useState<{ id: string; name: string; description: string | null; isPrivate: boolean; icon: string | null } | null>(null)
+  const [editingProject, setEditingProject] = useState<any>(null)
   const [editForm] = Form.useForm()
 
-  const handleCreate = async (values: { name: string; description?: string; isPrivate?: boolean; icon?: string }) => {
+  const [boardProjectId, setBoardProjectId] = useState<string | null>(null)
+  const [boardOpen, setBoardOpen] = useState(false)
+  const [boardForm] = Form.useForm()
+
+  const handleCreateProject = async (values: any) => {
     try {
       await createProject({
         variables: {
@@ -169,7 +181,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const handleEdit = async (values: { name: string; description?: string; isPrivate: boolean; icon?: string }) => {
+  const handleEditProject = async (values: any) => {
     if (!editingProject) return
     try {
       await editProject({
@@ -191,7 +203,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const handleDelete = async (projectId: string) => {
+  const handleDeleteProject = async (projectId: string) => {
     try {
       await deleteProject({ variables: { projectId } })
       message.success('Project deleted')
@@ -200,7 +212,44 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const treeData = projects.map((p: { id: string; name: string; description: string | null; isPrivate: boolean; icon: string | null }) => ({
+  const handleCreateBoard = async (values: { name: string; sections: string[] }) => {
+    if (!boardProjectId) return
+    try {
+      await createBoard({
+        variables: {
+          input: {
+            projectId: boardProjectId,
+            name: values.name,
+            sections: values.sections,
+          },
+        },
+      })
+      setBoardOpen(false)
+      boardForm.resetFields()
+      message.success('Board created')
+    } catch (err: unknown) {
+      message.error(err instanceof Error ? err.message : 'Failed to create board')
+    }
+  }
+
+  const pathMatch = (pattern: string) => {
+    const path = location.pathname
+    if (pattern === '/projects/:projectId') {
+      const m = path.match(/^\/projects\/([^/]+)$/)
+      return m ? m[1] : null
+    }
+    if (pattern === '/boards/:boardId') {
+      const m = path.match(/^\/boards\/([^/]+)$/)
+      return m ? m[1] : null
+    }
+    return null
+  }
+
+  const selectedProjectId = pathMatch('/projects/:projectId')
+  const selectedBoardId = pathMatch('/boards/:boardId')
+  const treeSelectedKey = selectedBoardId || selectedProjectId || undefined
+
+  const treeData = projects.map((p: any) => ({
     key: p.id,
     title: (
       <ProjectNodeTitle
@@ -209,9 +258,19 @@ export function AppLayout({ children }: { children: ReactNode }) {
           setEditingProject(p)
           editForm.setFieldsValue({ name: p.name, description: p.description, isPrivate: p.isPrivate, icon: p.icon })
         }}
-        onDelete={() => handleDelete(p.id)}
+        onDelete={() => handleDeleteProject(p.id)}
+        onCreateBoard={() => {
+          setBoardProjectId(p.id)
+          setBoardOpen(true)
+          boardForm.setFieldsValue({ sections: ['To Do', 'In Progress', 'Done'] })
+        }}
       />
     ),
+    children: (p.boards ?? []).map((b: any) => ({
+      key: b.id,
+      icon: <ProjectOutlined style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14 }} />,
+      title: <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{b.name}</span>,
+    })),
   }))
 
   const accountDropdownItems = accounts.map((acct) => ({
@@ -270,6 +329,17 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <Tree
                   treeData={treeData}
                   blockNode
+                  selectedKeys={treeSelectedKey ? [treeSelectedKey] : []}
+                  onSelect={(keys) => {
+                    if (keys.length === 0) return
+                    const key = keys[0] as string
+                    const isBoard = projects.some((p: any) =>
+                      (p.boards ?? []).some((b: any) => b.id === key)
+                    )
+                    if (isBoard) navigate(`/boards/${key}`)
+                    else navigate(`/projects/${key}`)
+                  }}
+                  defaultExpandAll
                   style={{ color: '#fff', background: 'transparent' }}
                   styles={{
                     root: { background: 'transparent' },
@@ -309,14 +379,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
         {children}
       </Content>
 
-      <Modal
-        title="Create Project"
-        open={createOpen}
-        onCancel={() => { setCreateOpen(false); createForm.resetFields() }}
-        onOk={() => createForm.submit()}
-        okText="Create"
-      >
-        <Form form={createForm} layout="vertical" onFinish={handleCreate} initialValues={{ isPrivate: false }}>
+      <Modal title="Create Project" open={createOpen} onCancel={() => { setCreateOpen(false); createForm.resetFields() }} onOk={() => createForm.submit()} okText="Create">
+        <Form form={createForm} layout="vertical" onFinish={handleCreateProject} initialValues={{ isPrivate: false }}>
           <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Enter a project name' }]}>
             <Input placeholder="Project name" />
           </Form.Item>
@@ -332,14 +396,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </Form>
       </Modal>
 
-      <Modal
-        title="Edit Project"
-        open={!!editingProject}
-        onCancel={() => { setEditingProject(null); editForm.resetFields() }}
-        onOk={() => editForm.submit()}
-        okText="Save"
-      >
-        <Form form={editForm} layout="vertical" onFinish={handleEdit}>
+      <Modal title="Edit Project" open={!!editingProject} onCancel={() => { setEditingProject(null); editForm.resetFields() }} onOk={() => editForm.submit()} okText="Save">
+        <Form form={editForm} layout="vertical" onFinish={handleEditProject}>
           <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Enter a project name' }]}>
             <Input placeholder="Project name" />
           </Form.Item>
@@ -352,9 +410,31 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Form.Item name="isPrivate" label="Private project" valuePropName="checked">
             <Switch />
           </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal title="Create Board" open={boardOpen} onCancel={() => { setBoardOpen(false); boardForm.resetFields() }} onOk={() => boardForm.submit()} okText="Create">
+        <Form form={boardForm} layout="vertical" onFinish={handleCreateBoard} initialValues={{ sections: ['To Do', 'In Progress', 'Done'] }}>
+          <Form.Item name="name" label="Board name" rules={[{ required: true, message: 'Enter a board name' }]}>
+            <Input placeholder="Board name" />
+          </Form.Item>
+          <Form.List name="sections">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name, ...rest }) => (
+                  <div key={key} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+                    <Form.Item {...rest} name={[name]} rules={[{ required: true, message: 'Required' }]} style={{ marginBottom: 0, flex: 1 }}>
+                      <Input placeholder="Section name" />
+                    </Form.Item>
+                    <Button type="text" danger onClick={() => remove(name)} disabled={fields.length <= 1}>✕</Button>
+                  </div>
+                ))}
+                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>Add Section</Button>
+              </>
+            )}
+          </Form.List>
         </Form>
       </Modal>
     </Layout>
   )
 }
-

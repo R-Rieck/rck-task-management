@@ -8,6 +8,8 @@ import { AcceptInvite } from './pages/AcceptInvite'
 import { Dashboard } from './pages/Dashboard'
 import { AccountSettings } from './pages/AccountSettings'
 import { UserProfile } from './pages/UserProfile'
+import { ProjectBoards } from './pages/ProjectBoards'
+import { BoardView } from './pages/BoardView'
 
 function App() {
   return (
@@ -39,6 +41,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects/:projectId"
+              element={
+                <ProtectedRoute>
+                  <ProjectBoards />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/boards/:boardId"
+              element={
+                <ProtectedRoute>
+                  <BoardView />
                 </ProtectedRoute>
               }
             />

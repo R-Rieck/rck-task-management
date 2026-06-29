@@ -1,5 +1,6 @@
 extend type Query {
     boards(projectId: ProjectId!): [BoardType!]!
+    board(id: BoardId!): BoardType!
 }
 
 extend type Mutation {

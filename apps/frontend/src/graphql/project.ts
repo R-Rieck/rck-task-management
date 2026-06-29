@@ -8,6 +8,15 @@ export const GET_PROJECTS = gql`
       description
       isPrivate
       icon
+      boards {
+        id
+        name
+        sections {
+          id
+          name
+          position
+        }
+      }
       createdAt
       updatedAt
     }
