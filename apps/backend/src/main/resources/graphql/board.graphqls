@@ -6,6 +6,9 @@ extend type Query {
 extend type Mutation {
     createBoard(input: CreateBoardInput!): BoardType!
     deleteBoard(boardId: BoardId!): Boolean!
+    createBoardSection(input: CreateBoardSectionInput!): BoardSectionType!
+    deleteBoardSection(sectionId: BoardSectionId!): Boolean!
+    renameBoardSection(sectionId: BoardSectionId!, name: String!): BoardSectionType!
 }
 
 type BoardType {
@@ -26,4 +29,10 @@ input CreateBoardInput {
     projectId: ProjectId!
     name: String!
     sections: [String!]!
+}
+
+input CreateBoardSectionInput {
+    boardId: BoardId!
+    name: String!
+    position: Int
 }

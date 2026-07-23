@@ -28,7 +28,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { UserMenu } from './UserMenu'
 import { useAuth } from '../auth/AuthContext'
 import { GET_PROJECTS, CREATE_PROJECT, EDIT_PROJECT, DELETE_PROJECT } from '../graphql/project'
-import { CREATE_BOARD } from '../graphql/board'
+import { CREATE_BOARD, DELETE_BOARD } from '../graphql/board'
 import { GET_USER_ACCOUNTS } from '../graphql/account'
 
 const { Sider, Content } = Layout
@@ -94,7 +94,21 @@ function ProjectNodeTitle({
     { key: 'delete', icon: <DeleteOutlined />, label: 'Delete', danger: true },
   ]
 
-  return (
+  const handleMenuClick = ({ key }: { key: string }) => {
+    if (key === 'createBoard') onCreateBoard()
+    else if (key === 'edit') onEdit()
+    else if (key === 'delete') {
+      Modal.confirm({
+        title: 'Delete this project?',
+        content: `Are you sure you want to delete "${project.name}"?`,
+        okText: 'Delete',
+        okButtonProps: { danger: true },
+        onOk: onDelete,
+      })
+    }
+  }
+
+  const rowContent = (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -110,29 +124,69 @@ function ProjectNodeTitle({
         style={{ opacity: hovered ? 1 : 0, transition: 'opacity 0.15s', flexShrink: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <Dropdown
-          menu={{
-            items: dropdownItems,
-            onClick: ({ key }) => {
-              if (key === 'createBoard') onCreateBoard()
-              else if (key === 'edit') onEdit()
-              else if (key === 'delete') {
-                Modal.confirm({
-                  title: 'Delete this project?',
-                  content: `Are you sure you want to delete "${project.name}"?`,
-                  okText: 'Delete',
-                  okButtonProps: { danger: true },
-                  onOk: onDelete,
-                })
-              }
-            },
-          }}
-          trigger={['click']}
-        >
+        <Dropdown menu={{ items: dropdownItems, onClick: handleMenuClick }} trigger={['click']}>
           <Button type="text" size="small" icon={<EllipsisOutlined />} style={{ color: 'rgba(255,255,255,0.45)' }} />
         </Dropdown>
       </span>
     </div>
+  )
+
+  return (
+    <Dropdown menu={{ items: dropdownItems, onClick: handleMenuClick }} trigger={['contextMenu']}>
+      {rowContent}
+    </Dropdown>
+  )
+}
+
+function BoardNodeTitle({
+  name,
+  onDelete,
+}: {
+  name: string
+  onDelete: () => void
+}) {
+  const [hovered, setHovered] = useState(false)
+
+  const items = [
+    { key: 'delete', icon: <DeleteOutlined />, label: 'Delete', danger: true },
+  ]
+
+  const handleMenuClick = ({ key }: { key: string }) => {
+    if (key === 'delete') {
+      Modal.confirm({
+        title: 'Delete this board?',
+        content: `Are you sure you want to delete "${name}"?`,
+        okText: 'Delete',
+        okButtonProps: { danger: true },
+        onOk: onDelete,
+      })
+    }
+  }
+
+  const rowContent = (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 4 }}
+    >
+      <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {name}
+      </span>
+      <span
+        style={{ opacity: hovered ? 1 : 0, transition: 'opacity 0.15s', flexShrink: 0 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['click']}>
+          <Button type="text" size="small" icon={<EllipsisOutlined />} style={{ color: 'rgba(255,255,255,0.45)' }} />
+        </Dropdown>
+      </span>
+    </div>
+  )
+
+  return (
+    <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['contextMenu']}>
+      {rowContent}
+    </Dropdown>
   )
 }
 
@@ -147,6 +201,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [editProject] = useMutation(EDIT_PROJECT, { refetchQueries: ['Projects'] })
   const [deleteProject] = useMutation(DELETE_PROJECT, { refetchQueries: ['Projects'] })
   const [createBoard] = useMutation(CREATE_BOARD, { refetchQueries: ['Projects'] })
+  const [deleteBoard] = useMutation(DELETE_BOARD, { refetchQueries: ['Projects'] })
 
   const projects = (projectsData as any)?.projects ?? []
   const accounts = (accountsData as { getUserAccounts: Array<{ id: string; name: string }> } | undefined)?.getUserAccounts ?? []
@@ -232,6 +287,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
+  const handleDeleteBoard = async (boardId: string) => {
+    try {
+      await deleteBoard({ variables: { boardId } })
+      message.success('Board deleted')
+    } catch (err: unknown) {
+      message.error(err instanceof Error ? err.message : 'Failed to delete board')
+    }
+  }
+
   const pathMatch = (pattern: string) => {
     const path = location.pathname
     if (pattern === '/projects/:projectId') {
@@ -269,7 +333,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     children: (p.boards ?? []).map((b: any) => ({
       key: b.id,
       icon: <ProjectOutlined style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14 }} />,
-      title: <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14 }}>{b.name}</span>,
+      title: <BoardNodeTitle name={b.name} onDelete={() => handleDeleteBoard(b.id)} />,
     })),
   }))
 

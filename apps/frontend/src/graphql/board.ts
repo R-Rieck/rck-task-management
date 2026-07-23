@@ -51,3 +51,29 @@ export const DELETE_BOARD = gql`
     deleteBoard(boardId: $boardId)
   }
 `
+
+export const CREATE_BOARD_SECTION = gql`
+  mutation CreateBoardSection($input: CreateBoardSectionInput!) {
+    createBoardSection(input: $input) {
+      id
+      name
+      position
+    }
+  }
+`
+
+export const DELETE_BOARD_SECTION = gql`
+  mutation DeleteBoardSection($sectionId: BoardSectionId!) {
+    deleteBoardSection(sectionId: $sectionId)
+  }
+`
+
+export const RENAME_BOARD_SECTION = gql`
+  mutation RenameBoardSection($sectionId: BoardSectionId!, $name: String!) {
+    renameBoardSection(sectionId: $sectionId, name: $name) {
+      id
+      name
+      position
+    }
+  }
+`

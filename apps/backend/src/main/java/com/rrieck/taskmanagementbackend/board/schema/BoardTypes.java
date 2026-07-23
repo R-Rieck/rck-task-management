@@ -52,4 +52,10 @@ public class BoardTypes {
 		String name,
 		List<String> sections
 	) {}
+
+	public record CreateBoardSectionInput(
+		BoardId boardId,
+		String name,
+		Integer position
+	) {}
 }
