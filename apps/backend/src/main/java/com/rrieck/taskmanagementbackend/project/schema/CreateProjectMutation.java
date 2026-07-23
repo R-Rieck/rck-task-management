@@ -19,10 +19,10 @@ public class CreateProjectMutation {
 			var project = createProjectService.create(
 				input.name(),
 				input.description(),
-				input.isPrivate() != null && input.isPrivate(),
 				input.icon(),
 				ctx.accountId(),
-				ctx.userId()
+				ctx.userId(),
+				input.memberIds()
 			);
 			return ProjectTypes.ProjectType.from(project);
 		});

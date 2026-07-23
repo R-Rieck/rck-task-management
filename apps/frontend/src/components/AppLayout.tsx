@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { Layout, Menu, Typography, Tree, Button, Modal, Form, Input, Switch, Spin, message, Dropdown, ConfigProvider } from 'antd'
+import { Layout, Menu, Typography, Tree, Button, Modal, Form, Input, Select, Spin, message, Dropdown, ConfigProvider } from 'antd'
 import {
   DashboardOutlined,
   FolderOutlined,
@@ -29,7 +29,7 @@ import { UserMenu } from './UserMenu'
 import { useAuth } from '../auth/AuthContext'
 import { GET_PROJECTS, CREATE_PROJECT, EDIT_PROJECT, DELETE_PROJECT } from '../graphql/project'
 import { CREATE_BOARD, DELETE_BOARD } from '../graphql/board'
-import { GET_USER_ACCOUNTS } from '../graphql/account'
+import { GET_USER_ACCOUNTS, GET_MEMBERS } from '../graphql/account'
 
 const { Sider, Content } = Layout
 
@@ -197,6 +197,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS)
   const { data: accountsData } = useQuery(GET_USER_ACCOUNTS)
+  const { data: membersData } = useQuery(GET_MEMBERS)
   const [createProject] = useMutation(CREATE_PROJECT, { refetchQueries: ['Projects'] })
   const [editProject] = useMutation(EDIT_PROJECT, { refetchQueries: ['Projects'] })
   const [deleteProject] = useMutation(DELETE_PROJECT, { refetchQueries: ['Projects'] })
@@ -205,6 +206,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const projects = (projectsData as any)?.projects ?? []
   const accounts = (accountsData as { getUserAccounts: Array<{ id: string; name: string }> } | undefined)?.getUserAccounts ?? []
+  const accountMembers = ((membersData as any)?.getMembers?.members ?? []) as Array<{ id: string; user: { id: string; name: string; email: string }; role: string }>
   const currentAccount = accounts.find((a) => a.id === currentAccountId)
 
   const [createOpen, setCreateOpen] = useState(false)
@@ -223,8 +225,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
           input: {
             name: values.name,
             description: values.description || null,
-            isPrivate: values.isPrivate ?? false,
             icon: values.icon || null,
+            memberIds: values.memberIds ?? [],
           },
         },
       })
@@ -245,8 +247,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
             projectId: editingProject.id,
             name: values.name,
             description: values.description || null,
-            isPrivate: values.isPrivate,
             icon: values.icon || null,
+            memberIds: values.memberIds ?? [],
           },
         },
       })
@@ -320,7 +322,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         project={p}
         onEdit={() => {
           setEditingProject(p)
-          editForm.setFieldsValue({ name: p.name, description: p.description, isPrivate: p.isPrivate, icon: p.icon })
+          editForm.setFieldsValue({ name: p.name, description: p.description, icon: p.icon, memberIds: (p.members ?? []).map((m: any) => m.user.id) })
         }}
         onDelete={() => handleDeleteProject(p.id)}
         onCreateBoard={() => {
@@ -444,7 +446,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </Content>
 
       <Modal title="Create Project" open={createOpen} onCancel={() => { setCreateOpen(false); createForm.resetFields() }} onOk={() => createForm.submit()} okText="Create">
-        <Form form={createForm} layout="vertical" onFinish={handleCreateProject} initialValues={{ isPrivate: false }}>
+        <Form form={createForm} layout="vertical" onFinish={handleCreateProject} initialValues={{ memberIds: [] }}>
           <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Enter a project name' }]}>
             <Input placeholder="Project name" />
           </Form.Item>
@@ -454,8 +456,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Form.Item name="icon" label="Icon">
             <IconPicker />
           </Form.Item>
-          <Form.Item name="isPrivate" label="Private project" valuePropName="checked">
-            <Switch />
+          <Form.Item name="memberIds" label="Members">
+            <Select
+              mode="multiple"
+              placeholder="Select members"
+              options={accountMembers.map((m) => ({ value: m.user.id, label: `${m.user.name} (${m.user.email})` }))}
+            />
           </Form.Item>
         </Form>
       </Modal>
@@ -471,8 +477,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Form.Item name="icon" label="Icon">
             <IconPicker />
           </Form.Item>
-          <Form.Item name="isPrivate" label="Private project" valuePropName="checked">
-            <Switch />
+          <Form.Item name="memberIds" label="Members">
+            <Select
+              mode="multiple"
+              placeholder="Select members"
+              options={accountMembers.map((m) => ({ value: m.user.id, label: `${m.user.name} (${m.user.email})` }))}
+            />
           </Form.Item>
         </Form>
       </Modal>

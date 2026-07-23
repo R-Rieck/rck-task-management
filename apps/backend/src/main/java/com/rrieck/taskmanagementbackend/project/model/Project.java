@@ -2,10 +2,13 @@ package com.rrieck.taskmanagementbackend.project.model;
 
 import com.rrieck.taskmanagementbackend.auth.model.account.AccountId;
 import com.rrieck.taskmanagementbackend.auth.model.user.User;
+import com.rrieck.taskmanagementbackend.project.model.member.ProjectMember;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "projects")
@@ -37,9 +40,6 @@ public class Project {
 	@AttributeOverride(name = "id", column = @Column(name = "account_id", nullable = false))
 	private AccountId account;
 
-	@Column(name = "is_private", nullable = false)
-	private boolean isPrivate;
-
 	@Column(nullable = true)
 	private String icon;
 
@@ -48,4 +48,8 @@ public class Project {
 
 	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
+
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@Builder.Default
+	private List<ProjectMember> members = new ArrayList<>();
 }

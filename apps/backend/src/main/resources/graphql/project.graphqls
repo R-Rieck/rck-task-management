@@ -12,24 +12,30 @@ type ProjectType {
     id: ProjectId!
     name: String!
     description: String
-    isPrivate: Boolean!
     icon: String
+    members: [ProjectMemberType!]!
     boards: [BoardType!]!
     createdAt: DateTime!
     updatedAt: DateTime!
 }
 
+type ProjectMemberType {
+    id: ProjectMemberId!
+    user: UserType!
+    joinedAt: DateTime!
+}
+
 input CreateProjectInput {
     name: String!
     description: String
-    isPrivate: Boolean
     icon: String
+    memberIds: [UserId!]
 }
 
 input EditProjectInput {
     projectId: ProjectId!
     name: String!
     description: String
-    isPrivate: Boolean!
     icon: String
+    memberIds: [UserId!]
 }

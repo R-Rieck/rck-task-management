@@ -6,8 +6,16 @@ export const GET_PROJECTS = gql`
       id
       name
       description
-      isPrivate
       icon
+      members {
+        id
+        user {
+          id
+          name
+          email
+        }
+        joinedAt
+      }
       boards {
         id
         name
@@ -29,8 +37,16 @@ export const CREATE_PROJECT = gql`
       id
       name
       description
-      isPrivate
       icon
+      members {
+        id
+        user {
+          id
+          name
+          email
+        }
+        joinedAt
+      }
       createdAt
       updatedAt
     }
@@ -43,8 +59,16 @@ export const EDIT_PROJECT = gql`
       id
       name
       description
-      isPrivate
       icon
+      members {
+        id
+        user {
+          id
+          name
+          email
+        }
+        joinedAt
+      }
       createdAt
       updatedAt
     }

@@ -5,6 +5,8 @@ import com.rrieck.taskmanagementbackend.common.error.OutgoingException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandler;
 import org.springframework.graphql.execution.ErrorType;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -81,6 +83,8 @@ public class GraphQlExceptionHandlerAdvice {
 		Exception exception,
 		DataFetchingEnvironment environment
 	) {
+		Logger logger = LoggerFactory.getLogger(GraphQlExceptionHandlerAdvice.class);
+		logger.error("Unhandled exception in GraphQL operation", exception);
 		return GraphqlErrorBuilder.newError(environment)
 		                          .errorType(ErrorType.INTERNAL_ERROR)
 		                          .message("An unexpected error occurred")
