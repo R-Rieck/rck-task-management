@@ -13,6 +13,7 @@ type ProjectType {
     name: String!
     description: String
     icon: String
+    ownerId: UserId!
     members: [ProjectMemberType!]!
     boards: [BoardType!]!
     createdAt: DateTime!

@@ -28,7 +28,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { UserMenu } from './UserMenu'
 import { useAuth } from '../auth/AuthContext'
 import { GET_PROJECTS, CREATE_PROJECT, EDIT_PROJECT, DELETE_PROJECT } from '../graphql/project'
-import { CREATE_BOARD, DELETE_BOARD } from '../graphql/board'
+import { CREATE_BOARD, EDIT_BOARD, DELETE_BOARD } from '../graphql/board'
 import { GET_USER_ACCOUNTS, GET_MEMBERS } from '../graphql/account'
 
 const { Sider, Content } = Layout
@@ -140,19 +140,25 @@ function ProjectNodeTitle({
 
 function BoardNodeTitle({
   name,
+  canDelete,
+  onEdit,
   onDelete,
 }: {
   name: string
+  canDelete: boolean
+  onEdit: () => void
   onDelete: () => void
 }) {
   const [hovered, setHovered] = useState(false)
 
   const items = [
-    { key: 'delete', icon: <DeleteOutlined />, label: 'Delete', danger: true },
+    { key: 'edit', icon: <EditOutlined />, label: 'Edit' },
+    ...(canDelete ? [{ key: 'delete', icon: <DeleteOutlined />, label: 'Delete', danger: true } as const] : []),
   ]
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    if (key === 'delete') {
+    if (key === 'edit') onEdit()
+    else if (key === 'delete') {
       Modal.confirm({
         title: 'Delete this board?',
         content: `Are you sure you want to delete "${name}"?`,
@@ -163,6 +169,17 @@ function BoardNodeTitle({
     }
   }
 
+  const actionButton = (
+    <span
+      style={{ opacity: hovered ? 1 : 0, transition: 'opacity 0.15s', flexShrink: 0 }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Dropdown menu={{ items: items.length > 0 ? items : [{ key: 'edit', icon: <EditOutlined />, label: 'Edit' }], onClick: handleMenuClick }} trigger={['click']}>
+        <Button type="text" size="small" icon={<EllipsisOutlined />} style={{ color: 'rgba(255,255,255,0.45)' }} />
+      </Dropdown>
+    </span>
+  )
+
   const rowContent = (
     <div
       onMouseEnter={() => setHovered(true)}
@@ -172,16 +189,11 @@ function BoardNodeTitle({
       <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {name}
       </span>
-      <span
-        style={{ opacity: hovered ? 1 : 0, transition: 'opacity 0.15s', flexShrink: 0 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['click']}>
-          <Button type="text" size="small" icon={<EllipsisOutlined />} style={{ color: 'rgba(255,255,255,0.45)' }} />
-        </Dropdown>
-      </span>
+      {actionButton}
     </div>
   )
+
+  if (!canDelete) return rowContent
 
   return (
     <Dropdown menu={{ items, onClick: handleMenuClick }} trigger={['contextMenu']}>
@@ -193,7 +205,7 @@ function BoardNodeTitle({
 export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { currentAccountId, switchAccount } = useAuth()
+  const { user, currentAccountId, switchAccount } = useAuth()
 
   const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS)
   const { data: accountsData } = useQuery(GET_USER_ACCOUNTS)
@@ -202,6 +214,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [editProject] = useMutation(EDIT_PROJECT, { refetchQueries: ['Projects'] })
   const [deleteProject] = useMutation(DELETE_PROJECT, { refetchQueries: ['Projects'] })
   const [createBoard] = useMutation(CREATE_BOARD, { refetchQueries: ['Projects'] })
+  const [editBoard] = useMutation(EDIT_BOARD, { refetchQueries: ['Projects'] })
   const [deleteBoard] = useMutation(DELETE_BOARD, { refetchQueries: ['Projects'] })
 
   const projects = (projectsData as any)?.projects ?? []
@@ -217,6 +230,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [boardProjectId, setBoardProjectId] = useState<string | null>(null)
   const [boardOpen, setBoardOpen] = useState(false)
   const [boardForm] = Form.useForm()
+  const [editingBoard, setEditingBoard] = useState<any>(null)
+  const [editBoardForm] = Form.useForm()
 
   const handleCreateProject = async (values: any) => {
     try {
@@ -241,17 +256,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const handleEditProject = async (values: any) => {
     if (!editingProject) return
     try {
-      await editProject({
-        variables: {
-          input: {
-            projectId: editingProject.id,
-            name: values.name,
-            description: values.description || null,
-            icon: values.icon || null,
-            memberIds: values.memberIds ?? [],
-          },
-        },
-      })
+      const isOwner = editingProject.ownerId === user?.id
+      const isAdmin = accountMembers.some((m) => m.user.id === user?.id && m.role === 'Admin')
+      const canEditMembers = isOwner || isAdmin
+
+      const input: any = {
+        projectId: editingProject.id,
+        name: values.name,
+        description: values.description || null,
+        icon: values.icon || null,
+      }
+      if (canEditMembers) {
+        input.memberIds = values.memberIds ?? []
+      }
+
+      await editProject({ variables: { input } })
       setEditingProject(null)
       editForm.resetFields()
       message.success('Project updated')
@@ -269,7 +288,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const handleCreateBoard = async (values: { name: string; sections: string[] }) => {
+  const handleCreateBoard = async (values: { name: string; sections: string[]; memberIds?: string[] }) => {
     if (!boardProjectId) return
     try {
       await createBoard({
@@ -278,6 +297,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             projectId: boardProjectId,
             name: values.name,
             sections: values.sections,
+            memberIds: values.memberIds ?? [],
           },
         },
       })
@@ -286,6 +306,30 @@ export function AppLayout({ children }: { children: ReactNode }) {
       message.success('Board created')
     } catch (err: unknown) {
       message.error(err instanceof Error ? err.message : 'Failed to create board')
+    }
+  }
+
+  const handleEditBoard = async (values: { name: string; memberIds?: string[] }) => {
+    if (!editingBoard) return
+    try {
+      const isOwner = editingBoard.ownerId === user?.id
+      const isAdmin = accountMembers.some((m) => m.user.id === user?.id && m.role === 'Admin')
+      const canEditMembers = isOwner || isAdmin
+
+      const input: any = {
+        boardId: editingBoard.id,
+        name: values.name,
+      }
+      if (canEditMembers) {
+        input.memberIds = values.memberIds ?? []
+      }
+
+      await editBoard({ variables: { input } })
+      setEditingBoard(null)
+      editBoardForm.resetFields()
+      message.success('Board updated')
+    } catch (err: unknown) {
+      message.error(err instanceof Error ? err.message : 'Failed to update board')
     }
   }
 
@@ -335,7 +379,17 @@ export function AppLayout({ children }: { children: ReactNode }) {
     children: (p.boards ?? []).map((b: any) => ({
       key: b.id,
       icon: <ProjectOutlined style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14 }} />,
-      title: <BoardNodeTitle name={b.name} onDelete={() => handleDeleteBoard(b.id)} />,
+      title: (
+        <BoardNodeTitle
+          name={b.name}
+          canDelete={b.ownerId === user?.id || (b.members?.some((m: any) => m.user.id === user?.id) && accountMembers.some((m) => m.user.id === user?.id && m.role === 'Admin'))}
+          onEdit={() => {
+            setEditingBoard(b)
+            editBoardForm.setFieldsValue({ name: b.name, memberIds: (b.members ?? []).map((m: any) => m.user.id) })
+          }}
+          onDelete={() => handleDeleteBoard(b.id)}
+        />
+      ),
     })),
   }))
 
@@ -477,13 +531,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Form.Item name="icon" label="Icon">
             <IconPicker />
           </Form.Item>
-          <Form.Item name="memberIds" label="Members">
-            <Select
-              mode="multiple"
-              placeholder="Select members"
-              options={accountMembers.map((m) => ({ value: m.user.id, label: `${m.user.name} (${m.user.email})` }))}
-            />
-          </Form.Item>
+          {(() => {
+            const isOwner = editingProject?.ownerId === user?.id
+            const isAdmin = accountMembers.some((m) => m.user.id === user?.id && m.role === 'Admin')
+            const canEditMembers = isOwner || isAdmin
+            return (
+              <Form.Item name="memberIds" label="Members">
+                <Select
+                  mode="multiple"
+                  placeholder="Select members"
+                  disabled={!canEditMembers}
+                  options={accountMembers.map((m) => ({ value: m.user.id, label: `${m.user.name} (${m.user.email})` }))}
+                />
+              </Form.Item>
+            )
+          })()}
         </Form>
       </Modal>
 
@@ -491,6 +553,16 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <Form form={boardForm} layout="vertical" onFinish={handleCreateBoard} initialValues={{ sections: ['To Do', 'In Progress', 'Done'] }}>
           <Form.Item name="name" label="Board name" rules={[{ required: true, message: 'Enter a board name' }]}>
             <Input placeholder="Board name" />
+          </Form.Item>
+          <Form.Item name="memberIds" label="Members">
+            <Select
+              mode="multiple"
+              placeholder="Select project members"
+              options={(() => {
+                const project = projects.find((p: any) => p.id === boardProjectId)
+                return (project?.members ?? []).map((m: any) => ({ value: m.user.id, label: `${m.user.name} (${m.user.email})` }))
+              })()}
+            />
           </Form.Item>
           <Form.List name="sections">
             {(fields, { add, remove }) => (
@@ -507,6 +579,33 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </>
             )}
           </Form.List>
+        </Form>
+      </Modal>
+
+      <Modal title="Edit Board" open={!!editingBoard} onCancel={() => { setEditingBoard(null); editBoardForm.resetFields() }} onOk={() => editBoardForm.submit()} okText="Save">
+        <Form form={editBoardForm} layout="vertical" onFinish={handleEditBoard}>
+          <Form.Item name="name" label="Board name" rules={[{ required: true, message: 'Enter a board name' }]}>
+            <Input placeholder="Board name" />
+          </Form.Item>
+          {(() => {
+            const isOwner = editingBoard?.ownerId === user?.id
+            const isBoardMember = editingBoard?.members?.some((m: any) => m.user.id === user?.id)
+            const isAdmin = accountMembers.some((m) => m.user.id === user?.id && m.role === 'Admin')
+            const canEditMembers = isOwner || (isBoardMember && isAdmin)
+            return (
+              <Form.Item name="memberIds" label="Members">
+                <Select
+                  mode="multiple"
+                  placeholder="Select project members"
+                  disabled={!canEditMembers}
+                  options={(() => {
+                    const project = projects.find((p: any) => p.id === editingBoard?.projectId)
+                    return (project?.members ?? []).map((m: any) => ({ value: m.user.id, label: `${m.user.name} (${m.user.email})` }))
+                  })()}
+                />
+              </Form.Item>
+            )
+          })()}
         </Form>
       </Modal>
     </Layout>

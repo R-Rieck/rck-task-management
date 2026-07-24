@@ -11,3 +11,4 @@ scalar ProjectId
 scalar ProjectMemberId
 scalar BoardId
 scalar BoardSectionId
+scalar BoardMemberId

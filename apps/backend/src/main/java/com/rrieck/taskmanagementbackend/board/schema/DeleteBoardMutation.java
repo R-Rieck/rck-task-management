@@ -17,7 +17,7 @@ public class DeleteBoardMutation {
 	@MutationMapping
 	public Boolean deleteBoard(@Argument BoardId boardId, Authentication auth) {
 		return AuthorizationWrapper.authenticated(auth, ctx -> {
-			deleteBoardService.delete(boardId);
+			deleteBoardService.delete(boardId, ctx.userId());
 			return true;
 		});
 	}

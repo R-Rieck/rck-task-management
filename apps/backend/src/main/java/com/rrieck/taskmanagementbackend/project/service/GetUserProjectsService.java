@@ -6,6 +6,7 @@ import com.rrieck.taskmanagementbackend.project.model.Project;
 import com.rrieck.taskmanagementbackend.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class GetUserProjectsService {
 	private final ProjectRepository projectRepository;
 
+	@Transactional(readOnly = true)
 	public List<Project> getProjects(AccountId accountId, UserId userId) {
 		return projectRepository.findAccessibleByAccount(accountId.id(), userId.id());
 	}

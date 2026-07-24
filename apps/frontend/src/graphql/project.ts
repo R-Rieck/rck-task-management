@@ -7,6 +7,7 @@ export const GET_PROJECTS = gql`
       name
       description
       icon
+      ownerId
       members {
         id
         user {
@@ -19,10 +20,20 @@ export const GET_PROJECTS = gql`
       boards {
         id
         name
+        ownerId
+        projectId
         sections {
           id
           name
           position
+        }
+        members {
+          id
+          user {
+            id
+            name
+            email
+          }
         }
       }
       createdAt
@@ -38,6 +49,7 @@ export const CREATE_PROJECT = gql`
       name
       description
       icon
+      ownerId
       members {
         id
         user {
@@ -60,6 +72,7 @@ export const EDIT_PROJECT = gql`
       name
       description
       icon
+      ownerId
       members {
         id
         user {

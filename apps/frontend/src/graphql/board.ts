@@ -5,10 +5,20 @@ export const GET_BOARDS = gql`
     boards(projectId: $projectId) {
       id
       name
+      ownerId
       sections {
         id
         name
         position
+      }
+      members {
+        id
+        user {
+          id
+          name
+          email
+        }
+        joinedAt
       }
       createdAt
       updatedAt
@@ -21,10 +31,20 @@ export const GET_BOARD = gql`
     board(id: $id) {
       id
       name
+      ownerId
       sections {
         id
         name
         position
+      }
+      members {
+        id
+        user {
+          id
+          name
+          email
+        }
+        joinedAt
       }
       createdAt
       updatedAt
@@ -37,10 +57,44 @@ export const CREATE_BOARD = gql`
     createBoard(input: $input) {
       id
       name
+      ownerId
       sections {
         id
         name
         position
+      }
+      members {
+        id
+        user {
+          id
+          name
+          email
+        }
+        joinedAt
+      }
+    }
+  }
+`
+
+export const EDIT_BOARD = gql`
+  mutation EditBoard($input: EditBoardInput!) {
+    editBoard(input: $input) {
+      id
+      name
+      ownerId
+      sections {
+        id
+        name
+        position
+      }
+      members {
+        id
+        user {
+          id
+          name
+          email
+        }
+        joinedAt
       }
     }
   }

@@ -33,6 +33,7 @@ public class ProjectTypes {
 		String name,
 		String description,
 		String icon,
+		UserId ownerId,
 		List<ProjectMemberType> members,
 		LocalDateTime createdAt,
 		LocalDateTime updatedAt
@@ -43,6 +44,7 @@ public class ProjectTypes {
 				.name(project.getName())
 				.description(project.getDescription())
 				.icon(project.getIcon())
+				.ownerId(project.getOwner().getId())
 				.members(project.getMembers().stream().map(ProjectMemberType::from).toList())
 				.createdAt(project.getCreatedAt())
 				.updatedAt(project.getUpdatedAt())

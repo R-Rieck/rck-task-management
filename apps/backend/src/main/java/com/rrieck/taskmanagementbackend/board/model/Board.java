@@ -41,6 +41,10 @@ public class Board {
 	@Builder.Default
 	private List<BoardSection> sections = new ArrayList<>();
 
+	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@Builder.Default
+	private List<BoardMember> members = new ArrayList<>();
+
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAt;
 
